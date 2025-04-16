@@ -194,7 +194,7 @@ func (buf *Buffer) AppendAttr(key, value any) {
 	buf.AppendAttrValue(value)
 }
 
-func (buf *Buffer) Append(b any, noQuote ...bool) {
+func (buf *Buffer) Append(b any, quote ...bool) {
 	switch v := b.(type) {
 	case byte:
 		buf.store = append(buf.store, v)
@@ -263,26 +263,26 @@ func (buf *Buffer) Append(b any, noQuote ...bool) {
 		appendMapIntoBuf(buf, v)
 
 	default:
-		if len(noQuote) > 0 && noQuote[0] {
+		if len(quote) > 0 && quote[0] {
+			// INFO: this is just a hack to have something like fmt.Sprintf("") but not allocating any additional space, and using our pool only to store it, and later override it
+			l := len(buf.store)
 			buf.store = fmt.Appendf(buf.store, "%#v", v)
+			l1 := len(buf.store)
+			m := buf.store[l:]
+
+			buf.store = appendStringWithQuotes(buf.store, m)
+			l2 := len(buf.store)
+
+			diff := l2 - l1
+
+			for i := 0; i < diff; i++ {
+				buf.store[l+i] = buf.store[l1+i]
+			}
+
+			buf.store = buf.store[:l+diff]
 			return
 		}
-		// INFO: this is just a hack to have something like fmt.Sprintf("") but not allocating any additional space, and using our pool only to store it, and later override it
-		l := len(buf.store)
 		buf.store = fmt.Appendf(buf.store, "%#v", v)
-		l1 := len(buf.store)
-		m := buf.store[l:]
-
-		buf.store = appendStringWithQuotes(buf.store, m)
-		l2 := len(buf.store)
-
-		diff := l2 - l1
-
-		for i := 0; i < diff; i++ {
-			buf.store[l+i] = buf.store[l1+i]
-		}
-
-		buf.store = buf.store[:l+diff]
 	}
 }
 
@@ -324,7 +324,7 @@ func (buf *Buffer) AppendWithQuote(v any) {
 		buf.store = appendStringWithQuotes(buf.store, []byte(val))
 		// buf.store = strconv.AppendQuote(buf.store, val)
 	default:
-		buf.Append(v)
+		buf.Append(v, true)
 	}
 }
 

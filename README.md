@@ -4,6 +4,23 @@ fastlog provides a slog Handler implementation in logfmt and json formats.
 
 In my initial benchmarks, it tends to perform better than some other popular loggers
 
+## Getting Started
+
+```go
+import (
+    "github.com/nxtcoder17/fastlog"
+)
+
+func main() {
+    // you can also choose other formats `Logfmt` and `JSON`
+    logfmt := fastlog.New(fastlog.Options{Format: fastlog.ConsoleFormat, ShowCaller: true, EnableColors: true})
+}
+```
+
+## Output
+
+![Example](https://github.com/user-attachments/assets/a89ab883-fea1-462c-9c67-dde889c4b1e0)
+
 ## benchmarks
 
 ```
