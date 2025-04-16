@@ -1,0 +1,26 @@
+tasks:
+  benchmark:
+    dir: ./benchmark
+    interactive: true
+    cmd:
+      - go test -bench=. -benchmem
+
+  profile:mem:
+    dir: ./benchmark
+    cmd:
+      - go test -bench=^BenchmarkFast -benchmem -memprofile ./mem.prof
+
+  profile:serve:
+    dir: ./benchmark
+    cmd:
+      - go tool pprof -http :8083 -no_browser ./mem.prof
+
+  example:logfmt:
+    interactive: true
+    cmd:
+      - go run ./example/example.go
+
+  example:json:
+    interactive: true
+    cmd:
+      - go run ./example/example.go --json
