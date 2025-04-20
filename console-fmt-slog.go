@@ -91,7 +91,7 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &consoleLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:    &Pool{},
+			pool:    NewPool(&l.Options),
 			attrs:   append(l.attrs, attrs...),
 			Options: l.Options,
 		},
@@ -102,7 +102,7 @@ func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 func (l *consoleLoggerSlog) WithGroup(name string) slog.Handler {
 	return &consoleLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:   &Pool{},
+			pool:   NewPool(&l.Options),
 			attrs:  l.attrs,
 			prefix: name + "." + l.prefix,
 
