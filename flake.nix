@@ -2,7 +2,7 @@
   description = "development workspace";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/0a25e2c87e784bf7e06e7833ec0e06d34836959a";
   };
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -34,7 +34,7 @@
             })
 
             # your packages here
-            go
+            go_1_20
           ];
 
           shellHook = ''
