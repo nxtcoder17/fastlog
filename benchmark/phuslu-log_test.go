@@ -19,12 +19,7 @@ func BenchmarkPhusluLog_withoutCaller(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		e := logger.Info()
-		for i := 1; i < len(attrs); i += 2 {
-			e = e.Any(attrs[i-1].(string), attrs[i])
-		}
-
-		e.Msg("hello world")
+		logger.Info().KeysAndValues(attrs...).Msg("hello world")
 	}
 }
 
@@ -41,12 +36,7 @@ func BenchmarkPhusluLog_withCaller(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		e := logger.Info()
-		for i := 1; i < len(attrs); i += 2 {
-			e = e.Any(attrs[i-1].(string), attrs[i])
-		}
-
-		e.Msg("hello world")
+		logger.Info().KeysAndValues(attrs...).Msg("hello world")
 	}
 }
 
