@@ -88,13 +88,13 @@ func New(options ...Options) *Logger {
 
 	switch opts.Format {
 	case ConsoleFormat:
-		return &Logger{loggerAPI: &consoleLogger{props}}
+		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
 	case LogfmtFormat:
-		return &Logger{loggerAPI: &logfmtLogger{props}}
+		return &Logger{loggerAPI: &logfmtLogger{kv: nil, loggerProps: props}}
 	case JSONFormat:
-		return &Logger{loggerAPI: &jsonLogger{props}}
+		return &Logger{loggerAPI: &jsonLogger{kv: nil, loggerProps: props}}
 	default:
-		return &Logger{loggerAPI: &consoleLogger{props}}
+		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
 	}
 }
 
@@ -104,6 +104,7 @@ type loggerAPI interface {
 	Warn(msg string, kv ...any)
 	Error(msg string, kv ...any)
 
+	With(kv ...any) *Logger
 	Slog() *slog.Logger
 }
 

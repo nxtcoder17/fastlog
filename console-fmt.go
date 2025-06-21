@@ -5,6 +5,7 @@ import (
 )
 
 type consoleLogger struct {
+	kv []any
 	*loggerProps
 }
 
@@ -28,6 +29,21 @@ func (c *consoleLogger) Warn(msg string, kv ...any) {
 	c.handleLog(slog.LevelWarn, msg, kv...)
 }
 
+// With implements loggerAPI.
+func (c *consoleLogger) With(kv ...any) *Logger {
+	return &Logger{
+		loggerAPI: &consoleLogger{
+			kv: kv,
+			loggerProps: &loggerProps{
+				attrs:   c.loggerProps.attrs,
+				prefix:  c.loggerProps.prefix,
+				pool:    NewPool(&c.loggerProps.Options),
+				Options: c.loggerProps.Options,
+			},
+		},
+	}
+}
+
 // Slog implements loggerAPI.
 func (c *consoleLogger) Slog() *slog.Logger {
 	return slog.New(&consoleLoggerSlog{c.loggerProps})
@@ -35,12 +51,12 @@ func (c *consoleLogger) Slog() *slog.Logger {
 
 var _ loggerAPI = (*consoleLogger)(nil)
 
-func (l *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error {
-	if level < l.LogLevel {
+func (c *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error {
+	if level < c.LogLevel {
 		return nil
 	}
 
-	buf := l.pool.Get()
+	buf := c.pool.Get()
 
 	buf.AppendCaller(2)
 	buf.AppendComponentSeparator()
@@ -53,8 +69,13 @@ func (l *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error
 
 	buf.AppendMsg(msg)
 
-	if len(kv) >= 2 {
+	if len(kv) >= 2 || len(c.kv) >= 2 {
 		buf.Append('\t')
+	}
+
+	for i := 1; i < len(c.kv); i += 2 {
+		buf.AppendComponentSeparator()
+		buf.AppendAttr(c.kv[i-1], c.kv[i])
 	}
 
 	for i := 1; i < len(kv); i += 2 {
@@ -63,7 +84,7 @@ func (l *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error
 	}
 
 	buf.Append('\n')
-	_, err := l.Writer.Write(buf.Bytes())
-	l.pool.Put(buf)
+	_, err := c.Writer.Write(buf.Bytes())
+	c.pool.Put(buf)
 	return err
 }

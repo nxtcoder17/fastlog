@@ -5,6 +5,7 @@ import (
 )
 
 type logfmtLogger struct {
+	kv []any
 	*loggerProps
 }
 
@@ -28,6 +29,25 @@ func (l *logfmtLogger) Warn(msg string, kv ...any) {
 	l.handleLog(slog.LevelWarn, msg, kv...)
 }
 
+// With implements loggerAPI.
+func (l *logfmtLogger) With(kv ...any) *Logger {
+	return &Logger{
+		loggerAPI: &logfmtLogger{
+			kv: kv,
+			loggerProps: &loggerProps{
+				attrs:   l.loggerProps.attrs,
+				prefix:  l.loggerProps.prefix,
+				pool:    NewPool(&l.loggerProps.Options),
+				Options: l.loggerProps.Options,
+			},
+		},
+	}
+}
+
+func (l *logfmtLogger) Slog() *slog.Logger {
+	return slog.New(&logfmtSlog{l.loggerProps})
+}
+
 var _ loggerAPI = (*logfmtLogger)(nil)
 
 func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error {
@@ -46,6 +66,11 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 	buf.AppendMsg(msg)
 	buf.AppendComponentSeparator()
 
+	for i := 1; i < len(l.kv); i += 2 {
+		buf.AppendAttr(l.kv[i-1], l.kv[i])
+		buf.AppendComponentSeparator()
+	}
+
 	for i := 1; i < len(kv); i += 2 {
 		buf.AppendAttr(kv[i-1], kv[i])
 		buf.AppendComponentSeparator()
@@ -55,8 +80,4 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 	_, err := l.Writer.Write(buf.Bytes())
 	l.pool.Put(buf)
 	return err
-}
-
-func (l *logfmtLogger) Slog() *slog.Logger {
-	return slog.New(&logfmtSlog{l.loggerProps})
 }

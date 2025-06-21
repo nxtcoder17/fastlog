@@ -5,6 +5,7 @@ import (
 )
 
 type jsonLogger struct {
+	kv []any
 	*loggerProps
 }
 
@@ -26,6 +27,21 @@ func (j *jsonLogger) Info(msg string, kv ...any) {
 // Warn implements loggerAPI.
 func (j *jsonLogger) Warn(msg string, kv ...any) {
 	j.handleLog(slog.LevelWarn, msg, kv...)
+}
+
+// With implements loggerAPI.
+func (j *jsonLogger) With(kv ...any) *Logger {
+	return &Logger{
+		loggerAPI: &jsonLogger{
+			kv: kv,
+			loggerProps: &loggerProps{
+				attrs:   j.loggerProps.attrs,
+				prefix:  j.loggerProps.prefix,
+				pool:    NewPool(&j.loggerProps.Options),
+				Options: j.loggerProps.Options,
+			},
+		},
+	}
 }
 
 // Slog implements loggerAPI.
@@ -51,6 +67,11 @@ func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
 	buf.AppendComponentSeparator()
 
 	buf.AppendMsg(msg)
+
+	for i := 1; i < len(j.kv); i += 2 {
+		buf.AppendComponentSeparator()
+		buf.AppendAttr(j.kv[i-1], j.kv[i])
+	}
 
 	for i := 1; i < len(kv); i += 2 {
 		buf.AppendComponentSeparator()
