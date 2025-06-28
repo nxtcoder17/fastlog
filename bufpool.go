@@ -47,7 +47,7 @@ func (buf *Buffer) Appendf(s string, args ...any) {
 	buf.store = fmt.Appendf(buf.store, s, args...)
 }
 
-func (buf *Buffer) AppendLogLevel(lvl slog.Level) {
+func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
 	switch buf.Format {
 	case ConsoleFormat:
 	default:
@@ -83,6 +83,8 @@ func (buf *Buffer) AppendLogLevel(lvl slog.Level) {
 	if buf.EnableColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
+
+	return true
 }
 
 func (buf *Buffer) AppendAttrSeparator() {
@@ -164,7 +166,7 @@ func (buf *Buffer) AppendAttrValue(value any) {
 	}
 }
 
-func (buf *Buffer) AppendCaller(skip int) {
+func (buf *Buffer) AppendCaller(skip int) bool {
 	if buf.ShowCaller {
 		_, file, line, ok := runtime.Caller(skip + 1)
 		if ok {
@@ -185,7 +187,31 @@ func (buf *Buffer) AppendCaller(skip int) {
 			buf.Append(':')
 			buf.Append(line)
 		}
+		return true
 	}
+	return false
+}
+
+func (buf *Buffer) AppendTimestamp() bool {
+	if buf.ShowTimestamp {
+		switch buf.Format {
+		case ConsoleFormat:
+		default:
+			buf.AppendAttrKey(buf.TimestampFieldKey)
+			buf.AppendAttrSeparator()
+			buf.Append('"')
+			defer buf.Append('"')
+		}
+
+		if buf.EnableColors {
+			buf.Append(FgBrightBlack)
+		}
+
+		buf.Append(time.Now().Format(buf.TimestampFormat))
+		return true
+	}
+
+	return false
 }
 
 func (buf *Buffer) AppendAttr(key, value any) {

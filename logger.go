@@ -30,8 +30,9 @@ type Options struct {
 
 	// ShowDebugLogs sets LogLevel to Debug
 	ShowDebugLogs bool
+	ShowCaller    bool
+	ShowTimestamp bool
 
-	ShowCaller   bool
 	EnableColors bool
 
 	TimestampFieldKey string
@@ -59,7 +60,7 @@ func New(options ...Options) *Logger {
 	}
 
 	if opts.TimestampFormat == "" {
-		opts.TimestampFormat = time.RFC850
+		opts.TimestampFormat = time.RFC3339
 	}
 
 	if opts.MessageFieldKey == "" {

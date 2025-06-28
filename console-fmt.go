@@ -58,12 +58,20 @@ func (c *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error
 
 	buf := c.pool.Get()
 
-	buf.AppendCaller(2)
-	buf.AppendComponentSeparator()
+	if buf.AppendTimestamp() {
+		buf.AppendComponentSeparator()
+		buf.Append('|')
+		buf.AppendComponentSeparator()
+	}
+
+	if buf.AppendCaller(2) {
+		buf.AppendComponentSeparator()
+		buf.Append('|')
+		buf.AppendComponentSeparator()
+	}
 
 	buf.AppendLogLevel(level)
 	buf.AppendComponentSeparator()
-
 	buf.Append('|')
 	buf.AppendComponentSeparator()
 

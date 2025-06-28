@@ -46,7 +46,10 @@ func main() {
 		},
 	}
 
-	logfmt := fastlog.New(fastlog.Options{Format: fastlog.LogfmtFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug})
+	logfmt := fastlog.New(fastlog.Options{
+		Format: fastlog.LogfmtFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug,
+		ShowTimestamp: true,
+	})
 	fmt.Printf("# LOGFMT:\n\n")
 	logfmt.Debug("hello", attrs...)
 	logfmt.Info("hello", attrs...)
@@ -60,7 +63,10 @@ func main() {
 	logfmtSlog.Warn("hello", attrs...)
 	logfmtSlog.Error("hello", attrs...)
 
-	consolefmt := fastlog.New(fastlog.Options{Format: fastlog.ConsoleFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug})
+	consolefmt := fastlog.New(fastlog.Options{
+		Format: fastlog.ConsoleFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug,
+		ShowTimestamp: true,
+	})
 	fmt.Printf("\n# CONSOLE:\n\n")
 	consolefmt.Debug("hello", attrs...)
 	consolefmt.Info("hello", attrs...)

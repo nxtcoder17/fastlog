@@ -15,12 +15,7 @@ tasks:
     cmd:
       - go tool pprof -http :8083 -no_browser ./mem.prof
 
-  example:logfmt:
+  example:
     interactive: true
     cmd:
       - go run ./example/example.go
-
-  example:json:
-    interactive: true
-    cmd:
-      - go run ./example/example.go --json
