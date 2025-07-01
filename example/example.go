@@ -56,6 +56,8 @@ func main() {
 	logfmt.Warn("hello", attrs...)
 	logfmt.Error("hello", attrs...)
 
+	logfmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
+
 	fmt.Printf("\n# LOGFMT (slog):\n\n")
 	logfmtSlog := logfmt.Slog()
 	logfmtSlog.Debug("hello", attrs...)
@@ -72,6 +74,7 @@ func main() {
 	consolefmt.Info("hello", attrs...)
 	consolefmt.Warn("hello", attrs...)
 	consolefmt.Error("hello", attrs...)
+	consolefmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# CONSOLE (slog):\n\n")
 	consoleFmtSlog := consolefmt.Slog()
@@ -86,6 +89,7 @@ func main() {
 	jsonfmt.Info("hello", attrs...)
 	jsonfmt.Warn("hello", attrs...)
 	jsonfmt.Error("hello", attrs...)
+	jsonfmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# JSON (slog):\n\n")
 	jsonFmtSlog := jsonfmt.Slog()

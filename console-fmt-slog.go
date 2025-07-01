@@ -57,7 +57,7 @@ func (l *consoleLoggerSlog) Enabled(ctx context.Context, lvl slog.Level) bool {
 func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) error {
 	buf := l.pool.Get()
 
-	buf.AppendCaller(3)
+	buf.AppendCaller(3 + l.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 	buf.AppendLogLevel(record.Level)
 	buf.AppendComponentSeparator()

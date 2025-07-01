@@ -48,6 +48,30 @@ func (l *logfmtLogger) Slog() *slog.Logger {
 	return slog.New(&logfmtSlog{l.loggerProps})
 }
 
+// Clone implements loggerAPI.
+func (c *logfmtLogger) Clone(options ...Options) *Logger {
+	opts := Options{}
+	if len(options) >= 1 {
+		opts = options[0]
+	}
+
+	opts = c.loggerProps.Options.clone(opts)
+
+	opts.withDefaults()
+
+	return &Logger{
+		loggerAPI: &logfmtLogger{
+			kv: c.kv,
+			loggerProps: &loggerProps{
+				attrs:   c.loggerProps.attrs,
+				prefix:  c.loggerProps.prefix,
+				pool:    NewPool(&opts),
+				Options: opts,
+			},
+		},
+	}
+}
+
 var _ loggerAPI = (*logfmtLogger)(nil)
 
 func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error {
@@ -57,7 +81,7 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 
 	buf := l.pool.Get()
 
-	buf.AppendCaller(2)
+	buf.AppendCaller(2 + l.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(level)

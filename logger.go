@@ -33,6 +33,8 @@ type Options struct {
 	ShowCaller    bool
 	ShowTimestamp bool
 
+	SkipCallerFrames int
+
 	EnableColors bool
 
 	TimestampFieldKey string
@@ -43,12 +45,7 @@ type Options struct {
 	CallerFieldKey  string
 }
 
-func New(options ...Options) *Logger {
-	opts := Options{}
-	if len(options) > 0 {
-		opts = options[0]
-	}
-
+func (opts *Options) withDefaults() {
 	if opts.Writer == nil {
 		opts.Writer = os.Stderr
 	}
@@ -78,6 +75,51 @@ func New(options ...Options) *Logger {
 	if opts.ShowDebugLogs {
 		opts.LogLevel = slog.LevelDebug
 	}
+}
+
+func (opts Options) clone(opt2 Options) Options {
+	if opt2.Writer == nil {
+		opts.Writer = opt2.Writer
+	}
+
+	if opt2.TimestampFieldKey != "" {
+		opts.TimestampFieldKey = opt2.TimestampFieldKey
+	}
+
+	if opt2.TimestampFormat != "" {
+		opts.TimestampFormat = opt2.TimestampFormat
+	}
+
+	if opt2.MessageFieldKey != "" {
+		opts.MessageFieldKey = opt2.MessageFieldKey
+	}
+
+	if opt2.LevelFieldKey != "" {
+		opts.LevelFieldKey = opt2.LevelFieldKey
+	}
+
+	if opt2.CallerFieldKey != "" {
+		opts.CallerFieldKey = opt2.CallerFieldKey
+	}
+
+	if opts.ShowDebugLogs || opt2.ShowDebugLogs {
+		opts.LogLevel = slog.LevelDebug
+	}
+
+	if opt2.SkipCallerFrames > 0 {
+		opts.SkipCallerFrames = opt2.SkipCallerFrames
+	}
+
+	return opts
+}
+
+func New(options ...Options) *Logger {
+	opts := Options{}
+	if len(options) > 0 {
+		opts = options[0]
+	}
+
+	opts.withDefaults()
 
 	props := &loggerProps{
 		attrs:  nil,
@@ -107,6 +149,8 @@ type loggerAPI interface {
 
 	With(kv ...any) *Logger
 	Slog() *slog.Logger
+
+	Clone(option ...Options) *Logger
 }
 
 type Logger struct {

@@ -54,7 +54,7 @@ func (j *jsonLoggerSlog) Enabled(_ context.Context, lvl slog.Level) bool {
 func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 	buf := j.pool.Get()
 	buf.Append("{")
-	buf.AppendCaller(3)
+	buf.AppendCaller(3 + j.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(record.Level)

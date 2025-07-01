@@ -49,6 +49,30 @@ func (c *consoleLogger) Slog() *slog.Logger {
 	return slog.New(&consoleLoggerSlog{c.loggerProps})
 }
 
+// Clone implements loggerAPI.
+func (c *consoleLogger) Clone(options ...Options) *Logger {
+	opts := Options{}
+	if len(options) >= 1 {
+		opts = options[0]
+	}
+
+	opts = c.loggerProps.Options.clone(opts)
+
+	opts.withDefaults()
+
+	return &Logger{
+		loggerAPI: &consoleLogger{
+			kv: c.kv,
+			loggerProps: &loggerProps{
+				attrs:   c.loggerProps.attrs,
+				prefix:  c.loggerProps.prefix,
+				pool:    NewPool(&opts),
+				Options: opts,
+			},
+		},
+	}
+}
+
 var _ loggerAPI = (*consoleLogger)(nil)
 
 func (c *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error {
@@ -64,7 +88,7 @@ func (c *consoleLogger) handleLog(level slog.Level, msg string, kv ...any) error
 		buf.AppendComponentSeparator()
 	}
 
-	if buf.AppendCaller(2) {
+	if buf.AppendCaller(2 + c.SkipCallerFrames) {
 		buf.AppendComponentSeparator()
 		buf.Append('|')
 		buf.AppendComponentSeparator()

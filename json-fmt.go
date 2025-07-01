@@ -49,6 +49,29 @@ func (j *jsonLogger) Slog() *slog.Logger {
 	return slog.New(&jsonLoggerSlog{j.loggerProps})
 }
 
+// Clone implements loggerAPI.
+func (c *jsonLogger) Clone(options ...Options) *Logger {
+	opts := Options{}
+	if len(options) >= 1 {
+		opts = options[0]
+	}
+
+	opts = c.loggerProps.Options.clone(opts)
+	opts.withDefaults()
+
+	return &Logger{
+		loggerAPI: &jsonLogger{
+			kv: c.kv,
+			loggerProps: &loggerProps{
+				attrs:   c.loggerProps.attrs,
+				prefix:  c.loggerProps.prefix,
+				pool:    NewPool(&opts),
+				Options: opts,
+			},
+		},
+	}
+}
+
 var _ loggerAPI = (*jsonLogger)(nil)
 
 func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
@@ -60,7 +83,7 @@ func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
 
 	buf.Append("{")
 
-	buf.AppendCaller(2)
+	buf.AppendCaller(2 + j.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(level)
