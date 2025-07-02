@@ -228,6 +228,8 @@ func (buf *Buffer) Append(b any, quote ...bool) {
 		buf.store = append(buf.store, v...)
 	case string:
 		buf.store = append(buf.store, v...)
+	case fmt.Stringer:
+		buf.store = append(buf.store, v.String()...)
 
 	case int64:
 		buf.store = strconv.AppendInt(buf.store, v, 10)
