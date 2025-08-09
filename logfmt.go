@@ -49,15 +49,8 @@ func (l *logfmtLogger) Slog() *slog.Logger {
 }
 
 // Clone implements loggerAPI.
-func (c *logfmtLogger) Clone(options ...Options) *Logger {
-	opts := Options{}
-	if len(options) >= 1 {
-		opts = options[0]
-	}
-
-	opts = c.loggerProps.Options.clone(opts)
-
-	opts.withDefaults()
+func (c *logfmtLogger) Clone(options ...OptionFn) *Logger {
+	opts := c.loggerProps.Options.clone(options...)
 
 	return &Logger{
 		loggerAPI: &logfmtLogger{
@@ -101,7 +94,10 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 	}
 
 	buf.Append('\n')
-	_, err := l.Writer.Write(buf.Bytes())
+	if _, err := l.Writer.Write(buf.Bytes()); err != nil {
+		return err
+	}
+
 	l.pool.Put(buf)
-	return err
+	return nil
 }

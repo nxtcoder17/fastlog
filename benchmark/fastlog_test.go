@@ -8,7 +8,7 @@ import (
 )
 
 func BenchmarkFastlog_console_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.ConsoleFormat, ShowCaller: false})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Console(), fastlog.WithoutCaller())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -18,7 +18,7 @@ func BenchmarkFastlog_console_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_console_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.ConsoleFormat, ShowCaller: true})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Console())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -28,7 +28,7 @@ func BenchmarkFastlog_console_withCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_console_slog_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.ConsoleFormat, ShowCaller: false}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Console(), fastlog.WithoutCaller()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -38,7 +38,7 @@ func BenchmarkFastlog_console_slog_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_console_slog_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.ConsoleFormat, ShowCaller: true}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Console()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -48,7 +48,7 @@ func BenchmarkFastlog_console_slog_withCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_logfmt_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.LogfmtFormat, ShowCaller: false})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Logfmt(), fastlog.WithoutCaller())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -58,7 +58,7 @@ func BenchmarkFastlog_logfmt_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_logfmt_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.LogfmtFormat, ShowCaller: true})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Logfmt())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -68,7 +68,7 @@ func BenchmarkFastlog_logfmt_withCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_logfmt_slog_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.LogfmtFormat, ShowCaller: false}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Logfmt(), fastlog.WithoutCaller()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -78,7 +78,7 @@ func BenchmarkFastlog_logfmt_slog_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_logfmt_slog_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.LogfmtFormat, ShowCaller: true}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Logfmt()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -88,7 +88,7 @@ func BenchmarkFastlog_logfmt_slog_withCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_json_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.JSONFormat, ShowCaller: false})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Json(), fastlog.WithoutCaller())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -98,7 +98,7 @@ func BenchmarkFastlog_json_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_json_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.JSONFormat, ShowCaller: true})
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Json())
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -108,7 +108,7 @@ func BenchmarkFastlog_json_withCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_json_slog_withoutCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.JSONFormat, ShowCaller: false}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Json(), fastlog.WithoutCaller()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 
@@ -118,7 +118,7 @@ func BenchmarkFastlog_json_slog_withoutCaller(b *testing.B) {
 }
 
 func BenchmarkFastlog_json_slog_withCaller(b *testing.B) {
-	logger := fastlog.New(fastlog.Options{Writer: io.Discard, Format: fastlog.JSONFormat, ShowCaller: true}).Slog()
+	logger := fastlog.New(fastlog.WithWriter(io.Discard), fastlog.Json()).Slog()
 	b.ReportAllocs()
 	b.ResetTimer()
 

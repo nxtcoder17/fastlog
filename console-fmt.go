@@ -50,15 +50,8 @@ func (c *consoleLogger) Slog() *slog.Logger {
 }
 
 // Clone implements loggerAPI.
-func (c *consoleLogger) Clone(options ...Options) *Logger {
-	opts := Options{}
-	if len(options) >= 1 {
-		opts = options[0]
-	}
-
-	opts = c.loggerProps.Options.clone(opts)
-
-	opts.withDefaults()
+func (c *consoleLogger) Clone(options ...OptionFn) *Logger {
+	opts := c.loggerProps.Options.clone(options...)
 
 	return &Logger{
 		loggerAPI: &consoleLogger{
