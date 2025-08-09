@@ -10,11 +10,17 @@ import (
 )
 
 type Pool struct {
+	size int
+	opts *Options
+
 	sync.Pool
 }
 
 func NewPool(opts *Options) *Pool {
 	return &Pool{
+		size: 256,
+		opts: opts,
+
 		Pool: sync.Pool{
 			New: func() any {
 				return &Buffer{
@@ -27,14 +33,22 @@ func NewPool(opts *Options) *Pool {
 }
 
 func (p *Pool) Get() *Buffer {
-	if v := p.Pool.Get(); v != nil {
-		return v.(*Buffer)
+	v := p.Pool.Get()
+	if v == nil {
+		return &Buffer{
+			store:   make([]byte, 0, p.size),
+			Options: p.opts,
+		}
 	}
-	return &Buffer{}
+	return v.(*Buffer)
 }
 
 func (p *Pool) Put(msg *Buffer) {
 	msg.Reset()
+	// If buffer has grown too large, replace it with a new smaller buffer
+	if cap(msg.store) > 4096 {
+		msg.store = make([]byte, 0, 256)
+	}
 	p.Pool.Put(msg)
 }
 
@@ -113,7 +127,6 @@ func (buf *Buffer) AppendComponentSeparator() {
 
 func (buf *Buffer) AppendMsg(msg string) {
 	switch buf.Format {
-	case ConsoleFormat:
 	case JSONFormat, LogfmtFormat:
 		buf.AppendAttrKey(buf.MessageFieldKey)
 		buf.AppendAttrSeparator()
@@ -185,7 +198,11 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 
 			trimCallerPath(buf, file, 2)
 			buf.Append(':')
-			buf.Append(line)
+			if buf.Format == ConsoleFormat {
+				buf.Appendf("%-3d", line)
+			} else {
+				buf.Append(line)
+			}
 		}
 		return true
 	}
@@ -228,6 +245,8 @@ func (buf *Buffer) Append(b any, quote ...bool) {
 		buf.store = append(buf.store, v...)
 	case string:
 		buf.store = append(buf.store, v...)
+	case time.Time:
+		buf.store = append(buf.store, v.Format(buf.TimestampFormat)...)
 	case fmt.Stringer:
 		buf.store = append(buf.store, v.String()...)
 
@@ -252,9 +271,6 @@ func (buf *Buffer) Append(b any, quote ...bool) {
 
 	case error:
 		buf.store = appendStringWithQuotes(buf.store, []byte(v.Error()))
-
-	case time.Time:
-		buf.store = append(buf.store, v.Format(buf.TimestampFormat)...)
 
 	case []any:
 		appendSliceIntoBuf(buf, v)
@@ -347,10 +363,8 @@ func (buf *Buffer) AppendWithQuote(v any) {
 	switch val := v.(type) {
 	case []byte:
 		buf.store = appendStringWithQuotes(buf.store, val)
-		// buf.store = strconv.AppendQuote(buf.store, string(val))
 	case string:
 		buf.store = appendStringWithQuotes(buf.store, []byte(val))
-		// buf.store = strconv.AppendQuote(buf.store, val)
 	default:
 		buf.Append(v, true)
 	}

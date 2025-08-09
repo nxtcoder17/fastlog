@@ -37,7 +37,7 @@ func (c *consoleLogger) With(kv ...any) *Logger {
 			loggerProps: &loggerProps{
 				attrs:   c.loggerProps.attrs,
 				prefix:  c.loggerProps.prefix,
-				pool:    NewPool(&c.loggerProps.Options),
+				pool:    c.loggerProps.pool,
 				Options: c.loggerProps.Options,
 			},
 		},

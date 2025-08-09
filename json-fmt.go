@@ -37,7 +37,7 @@ func (j *jsonLogger) With(kv ...any) *Logger {
 			loggerProps: &loggerProps{
 				attrs:   j.loggerProps.attrs,
 				prefix:  j.loggerProps.prefix,
-				pool:    NewPool(&j.loggerProps.Options),
+				pool:    j.loggerProps.pool,
 				Options: j.loggerProps.Options,
 			},
 		},

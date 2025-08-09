@@ -78,7 +78,7 @@ func (opts *Options) withDefaults() {
 }
 
 func (opts Options) clone(opt2 Options) Options {
-	if opt2.Writer == nil {
+	if opt2.Writer != nil {
 		opts.Writer = opt2.Writer
 	}
 

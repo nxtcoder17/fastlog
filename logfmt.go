@@ -37,7 +37,7 @@ func (l *logfmtLogger) With(kv ...any) *Logger {
 			loggerProps: &loggerProps{
 				attrs:   l.loggerProps.attrs,
 				prefix:  l.loggerProps.prefix,
-				pool:    NewPool(&l.loggerProps.Options),
+				pool:    l.loggerProps.pool,
 				Options: l.loggerProps.Options,
 			},
 		},

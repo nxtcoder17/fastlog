@@ -57,8 +57,17 @@ func (l *consoleLoggerSlog) Enabled(ctx context.Context, lvl slog.Level) bool {
 func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) error {
 	buf := l.pool.Get()
 
-	buf.AppendCaller(3 + l.SkipCallerFrames)
-	buf.AppendComponentSeparator()
+	if buf.AppendTimestamp() {
+		buf.Appendf(" | ")
+		buf.AppendComponentSeparator()
+	}
+
+	if buf.AppendCaller(3 + l.SkipCallerFrames) {
+		buf.AppendComponentSeparator()
+		buf.Append('|')
+		buf.AppendComponentSeparator()
+	}
+
 	buf.AppendLogLevel(record.Level)
 	buf.AppendComponentSeparator()
 	buf.Append('|')
@@ -91,7 +100,7 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &consoleLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:    NewPool(&l.Options),
+			pool:    l.pool,
 			attrs:   append(l.attrs, attrs...),
 			Options: l.Options,
 		},
@@ -102,7 +111,7 @@ func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 func (l *consoleLoggerSlog) WithGroup(name string) slog.Handler {
 	return &consoleLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:   NewPool(&l.Options),
+			pool:   l.pool,
 			attrs:  l.attrs,
 			prefix: name + "." + l.prefix,
 
