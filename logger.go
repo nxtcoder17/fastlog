@@ -135,7 +135,7 @@ func New(options ...OptionFn) *Logger {
 		LogLevel:         slog.LevelInfo,
 		ShowDebugLogs:    false,
 		ShowCaller:       true,
-		ShowTimestamp:    false,
+		ShowTimestamp:    true,
 		EnableColors:     true,
 		SkipCallerFrames: 0,
 	}
