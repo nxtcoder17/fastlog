@@ -10,17 +10,22 @@ import (
 )
 
 type Pool struct {
+	newBuffer func() *Buffer
 	sync.Pool
 }
 
 func NewPool(opts *Options) *Pool {
+	newBuffer := func() *Buffer {
+		return &Buffer{
+			store:   make([]byte, 0, InitialBufSize),
+			Options: opts,
+		}
+	}
 	return &Pool{
+		newBuffer: newBuffer,
 		Pool: sync.Pool{
 			New: func() any {
-				return &Buffer{
-					store:   make([]byte, 0, 256),
-					Options: opts,
-				}
+				return newBuffer()
 			},
 		},
 	}
@@ -30,12 +35,16 @@ func (p *Pool) Get() *Buffer {
 	if v := p.Pool.Get(); v != nil {
 		return v.(*Buffer)
 	}
-	return &Buffer{}
+	return p.newBuffer()
 }
 
-func (p *Pool) Put(msg *Buffer) {
-	msg.Reset()
-	p.Pool.Put(msg)
+func (p *Pool) Put(buf *Buffer) {
+	buf.Reset()
+	// If buffer has grown too large, replace it with a new smaller buffer
+	if cap(buf.store) > MaxBufSize {
+		buf = p.newBuffer()
+	}
+	p.Pool.Put(buf)
 }
 
 type Buffer struct {
@@ -49,15 +58,15 @@ func (buf *Buffer) Appendf(s string, args ...any) {
 
 func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
 	switch buf.Format {
-	case ConsoleFormat:
+	case logFormatConsole:
 	default:
-		buf.AppendAttrKey(buf.LevelFieldKey)
+		buf.AppendAttrKey(LevelFieldKey)
 		buf.AppendAttrSeparator()
 	}
 
 	switch lvl {
 	case slog.LevelDebug:
-		if buf.EnableColors {
+		if !buf.EnableColors {
 			buf.store = append(buf.store, FgWhite...)
 		}
 		buf.AppendAttrValue("DEBUG")
@@ -92,7 +101,7 @@ func (buf *Buffer) AppendAttrSeparator() {
 		buf.store = append(buf.store, ColorSeparator...)
 	}
 	switch buf.Format {
-	case JSONFormat:
+	case logFormatJSON:
 		buf.store = append(buf.store, ':')
 	default:
 		buf.store = append(buf.store, '=')
@@ -104,7 +113,7 @@ func (buf *Buffer) AppendAttrSeparator() {
 
 func (buf *Buffer) AppendComponentSeparator() {
 	switch buf.Format {
-	case JSONFormat:
+	case logFormatJSON:
 		buf.store = append(buf.store, ',')
 	default:
 		buf.store = append(buf.store, ' ')
@@ -113,9 +122,8 @@ func (buf *Buffer) AppendComponentSeparator() {
 
 func (buf *Buffer) AppendMsg(msg string) {
 	switch buf.Format {
-	case ConsoleFormat:
-	case JSONFormat, LogfmtFormat:
-		buf.AppendAttrKey(buf.MessageFieldKey)
+	case logFormatJSON, logFormatLogFmt:
+		buf.AppendAttrKey(MessageFieldKey)
 		buf.AppendAttrSeparator()
 	}
 
@@ -134,7 +142,7 @@ func (buf *Buffer) AppendAttrKey(key any) {
 	}
 
 	switch buf.Format {
-	case JSONFormat:
+	case logFormatJSON:
 		buf.AppendWithQuote(key)
 	default:
 		buf.Append(key)
@@ -159,7 +167,7 @@ func (buf *Buffer) AppendAttrKeyColorReset() {
 
 func (buf *Buffer) AppendAttrValue(value any) {
 	switch buf.Format {
-	case JSONFormat:
+	case logFormatJSON:
 		buf.AppendWithQuote(value)
 	default:
 		buf.Append(value)
@@ -171,9 +179,9 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 		_, file, line, ok := runtime.Caller(skip + 1)
 		if ok {
 			switch buf.Format {
-			case ConsoleFormat:
+			case logFormatConsole:
 			default:
-				buf.AppendAttrKey(buf.CallerFieldKey)
+				buf.AppendAttrKey(CallerFieldKey)
 				buf.AppendAttrSeparator()
 				buf.Append('"')
 				defer buf.Append('"')
@@ -185,7 +193,11 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 
 			trimCallerPath(buf, file, 2)
 			buf.Append(':')
-			buf.Append(line)
+			if buf.Format == logFormatConsole {
+				buf.Appendf("%-3d", line)
+			} else {
+				buf.Append(line)
+			}
 		}
 		return true
 	}
@@ -195,9 +207,9 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 func (buf *Buffer) AppendTimestamp() bool {
 	if buf.ShowTimestamp {
 		switch buf.Format {
-		case ConsoleFormat:
+		case logFormatConsole:
 		default:
-			buf.AppendAttrKey(buf.TimestampFieldKey)
+			buf.AppendAttrKey(TimestampFieldKey)
 			buf.AppendAttrSeparator()
 			buf.Append('"')
 			defer buf.Append('"')
@@ -207,7 +219,7 @@ func (buf *Buffer) AppendTimestamp() bool {
 			buf.Append(FgBrightBlack)
 		}
 
-		buf.Append(time.Now().Format(buf.TimestampFormat))
+		buf.Append(time.Now().Format(TimestampFormat))
 		return true
 	}
 
@@ -228,6 +240,8 @@ func (buf *Buffer) Append(b any, quote ...bool) {
 		buf.store = append(buf.store, v...)
 	case string:
 		buf.store = append(buf.store, v...)
+	case time.Time:
+		buf.store = append(buf.store, v.Format(TimestampFormat)...)
 	case fmt.Stringer:
 		buf.store = append(buf.store, v.String()...)
 
@@ -252,9 +266,6 @@ func (buf *Buffer) Append(b any, quote ...bool) {
 
 	case error:
 		buf.store = appendStringWithQuotes(buf.store, []byte(v.Error()))
-
-	case time.Time:
-		buf.store = append(buf.store, v.Format(buf.TimestampFormat)...)
 
 	case []any:
 		appendSliceIntoBuf(buf, v)
@@ -347,10 +358,8 @@ func (buf *Buffer) AppendWithQuote(v any) {
 	switch val := v.(type) {
 	case []byte:
 		buf.store = appendStringWithQuotes(buf.store, val)
-		// buf.store = strconv.AppendQuote(buf.store, string(val))
 	case string:
 		buf.store = appendStringWithQuotes(buf.store, []byte(val))
-		// buf.store = strconv.AppendQuote(buf.store, val)
 	default:
 		buf.Append(v, true)
 	}

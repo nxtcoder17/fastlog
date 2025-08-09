@@ -37,7 +37,7 @@ func (j *jsonLogger) With(kv ...any) *Logger {
 			loggerProps: &loggerProps{
 				attrs:   j.loggerProps.attrs,
 				prefix:  j.loggerProps.prefix,
-				pool:    NewPool(&j.loggerProps.Options),
+				pool:    j.loggerProps.pool,
 				Options: j.loggerProps.Options,
 			},
 		},
@@ -50,14 +50,8 @@ func (j *jsonLogger) Slog() *slog.Logger {
 }
 
 // Clone implements loggerAPI.
-func (c *jsonLogger) Clone(options ...Options) *Logger {
-	opts := Options{}
-	if len(options) >= 1 {
-		opts = options[0]
-	}
-
-	opts = c.loggerProps.Options.clone(opts)
-	opts.withDefaults()
+func (c *jsonLogger) Clone(options ...OptionFn) *Logger {
+	opts := c.loggerProps.Options.clone(options...)
 
 	return &Logger{
 		loggerAPI: &jsonLogger{

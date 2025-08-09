@@ -89,7 +89,7 @@ func (l *logfmtSlog) Handle(ctx context.Context, record slog.Record) error {
 func (l *logfmtSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &logfmtSlog{
 		loggerProps: &loggerProps{
-			pool:    NewPool(&l.Options),
+			pool:    l.pool,
 			attrs:   append(l.attrs, attrs...),
 			Options: l.Options,
 		},
@@ -100,7 +100,7 @@ func (l *logfmtSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 func (l *logfmtSlog) WithGroup(name string) slog.Handler {
 	return &logfmtSlog{
 		loggerProps: &loggerProps{
-			pool:   NewPool(&l.Options),
+			pool:   l.pool,
 			attrs:  l.attrs,
 			prefix: name + "." + l.prefix,
 

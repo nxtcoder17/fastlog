@@ -18,108 +18,133 @@ type loggerProps struct {
 type logformat string
 
 const (
-	ConsoleFormat logformat = "console"
-	JSONFormat    logformat = "json"
-	LogfmtFormat  logformat = "logfmt"
+	logFormatConsole logformat = "console"
+	logFormatJSON    logformat = "json"
+	logFormatLogFmt  logformat = "logfmt"
+)
+
+var (
+	LevelFieldKey   string = "level"
+	CallerFieldKey  string = "caller"
+	MessageFieldKey string = "message"
+
+	TimestampFieldKey string = "timestamp"
+	TimestampFormat   string = time.RFC3339
+)
+
+var (
+	InitialBufSize int = 256
+	MaxBufSize     int = 4096
 )
 
 type Options struct {
-	Writer   io.Writer
-	Format   logformat
+	Writer io.Writer
+	Format logformat
+
 	LogLevel slog.Level
 
-	// ShowDebugLogs sets LogLevel to Debug
+	// ShowDebugLogs and LogLevel are mutually exclusive, as ShowDebugLogs set LogLevel to Debug regardless of LogLevel field being set or not
 	ShowDebugLogs bool
-	ShowCaller    bool
+
+	ShowCaller bool
+
 	ShowTimestamp bool
+	EnableColors  bool
 
 	SkipCallerFrames int
-
-	EnableColors bool
-
-	TimestampFieldKey string
-	TimestampFormat   string
-
-	MessageFieldKey string
-	LevelFieldKey   string
-	CallerFieldKey  string
 }
 
-func (opts *Options) withDefaults() {
-	if opts.Writer == nil {
-		opts.Writer = os.Stderr
-	}
+type OptionFn func(opt *Options)
 
-	opts.Writer = &syncWriter{writer: opts.Writer}
-
-	if opts.TimestampFieldKey == "" {
-		opts.TimestampFieldKey = "ts"
-	}
-
-	if opts.TimestampFormat == "" {
-		opts.TimestampFormat = time.RFC3339
-	}
-
-	if opts.MessageFieldKey == "" {
-		opts.MessageFieldKey = "message"
-	}
-
-	if opts.LevelFieldKey == "" {
-		opts.LevelFieldKey = "level"
-	}
-
-	if opts.CallerFieldKey == "" {
-		opts.CallerFieldKey = "caller"
-	}
-
-	if opts.ShowDebugLogs {
-		opts.LogLevel = slog.LevelDebug
+func WithWriter(writer io.Writer) OptionFn {
+	return func(opt *Options) {
+		opt.Writer = writer
 	}
 }
 
-func (opts Options) clone(opt2 Options) Options {
-	if opt2.Writer == nil {
-		opts.Writer = opt2.Writer
+func WithLogLevel(level slog.Level) OptionFn {
+	return func(opt *Options) {
+		opt.LogLevel = level
+	}
+}
+
+func WithoutCaller() OptionFn {
+	return func(opt *Options) {
+		opt.ShowCaller = false
+	}
+}
+
+func ShowDebugLogs(enabled bool) OptionFn {
+	return func(opt *Options) {
+		opt.ShowDebugLogs = enabled
+	}
+}
+
+func SkipCallerFrames(count int) OptionFn {
+	return func(opt *Options) {
+		opt.SkipCallerFrames = count
+	}
+}
+
+func Json() OptionFn {
+	return func(opt *Options) {
+		opt.Format = logFormatJSON
+	}
+}
+
+func Logfmt() OptionFn {
+	return func(opt *Options) {
+		opt.Format = logFormatLogFmt
+	}
+}
+
+func Console() OptionFn {
+	return func(opt *Options) {
+		opt.Format = logFormatConsole
+	}
+}
+
+func WithoutColors() OptionFn {
+	return func(opt *Options) {
+		opt.EnableColors = false
+	}
+}
+
+func WithoutTimestamp() OptionFn {
+	return func(opt *Options) {
+		opt.ShowTimestamp = false
+	}
+}
+
+func (opts Options) clone(options ...OptionFn) Options {
+	for _, optFn := range options {
+		optFn(&opts)
 	}
 
-	if opt2.TimestampFieldKey != "" {
-		opts.TimestampFieldKey = opt2.TimestampFieldKey
-	}
-
-	if opt2.TimestampFormat != "" {
-		opts.TimestampFormat = opt2.TimestampFormat
-	}
-
-	if opt2.MessageFieldKey != "" {
-		opts.MessageFieldKey = opt2.MessageFieldKey
-	}
-
-	if opt2.LevelFieldKey != "" {
-		opts.LevelFieldKey = opt2.LevelFieldKey
-	}
-
-	if opt2.CallerFieldKey != "" {
-		opts.CallerFieldKey = opt2.CallerFieldKey
-	}
-
-	if opts.ShowDebugLogs || opt2.ShowDebugLogs {
-		opts.LogLevel = slog.LevelDebug
-	}
-
-	if opt2.SkipCallerFrames > 0 {
-		opts.SkipCallerFrames = opt2.SkipCallerFrames
+	if _, ok := opts.Writer.(*syncWriter); !ok {
+		opts.Writer = &syncWriter{writer: opts.Writer}
 	}
 
 	return opts
 }
 
-func New(options ...Options) *Logger {
-	opts := Options{}
-	if len(options) > 0 {
-		opts = options[0]
+func New(options ...OptionFn) *Logger {
+	opts := Options{
+		Writer:           os.Stderr,
+		Format:           logFormatConsole,
+		LogLevel:         slog.LevelInfo,
+		ShowDebugLogs:    false,
+		ShowCaller:       true,
+		ShowTimestamp:    false,
+		EnableColors:     true,
+		SkipCallerFrames: 0,
 	}
 
-	opts.withDefaults()
+	for _, optFn := range options {
+		optFn(&opts)
+	}
+
+	opts.Writer = &syncWriter{writer: opts.Writer}
 
 	props := &loggerProps{
 		attrs:  nil,
@@ -130,11 +155,11 @@ func New(options ...Options) *Logger {
 	}
 
 	switch opts.Format {
-	case ConsoleFormat:
+	case logFormatConsole:
 		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
-	case LogfmtFormat:
+	case logFormatLogFmt:
 		return &Logger{loggerAPI: &logfmtLogger{kv: nil, loggerProps: props}}
-	case JSONFormat:
+	case logFormatJSON:
 		return &Logger{loggerAPI: &jsonLogger{kv: nil, loggerProps: props}}
 	default:
 		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
@@ -150,7 +175,7 @@ type loggerAPI interface {
 	With(kv ...any) *Logger
 	Slog() *slog.Logger
 
-	Clone(option ...Options) *Logger
+	Clone(option ...OptionFn) *Logger
 }
 
 type Logger struct {

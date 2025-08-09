@@ -84,7 +84,7 @@ func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 func (j *jsonLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &jsonLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:    NewPool(&j.Options),
+			pool:    j.pool,
 			attrs:   append(j.attrs, attrs...),
 			Options: j.Options,
 		},
@@ -95,7 +95,7 @@ func (j *jsonLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 func (j *jsonLoggerSlog) WithGroup(name string) slog.Handler {
 	return &jsonLoggerSlog{
 		loggerProps: &loggerProps{
-			pool:    NewPool(&j.Options),
+			pool:    j.pool,
 			attrs:   j.attrs,
 			prefix:  name + "." + j.prefix,
 			Options: j.Options,

@@ -46,17 +46,14 @@ func main() {
 		},
 	}
 
-	logfmt := fastlog.New(fastlog.Options{
-		Format: fastlog.LogfmtFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug,
-		ShowTimestamp: true,
-	})
+	logfmt := fastlog.New(fastlog.Logfmt(), fastlog.ShowDebugLogs(*debug))
 	fmt.Printf("# LOGFMT:\n\n")
 	logfmt.Debug("hello", attrs...)
 	logfmt.Info("hello", attrs...)
 	logfmt.Warn("hello", attrs...)
 	logfmt.Error("hello", attrs...)
 
-	logfmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
+	logfmt.Clone().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# LOGFMT (slog):\n\n")
 	logfmtSlog := logfmt.Slog()
@@ -65,16 +62,15 @@ func main() {
 	logfmtSlog.Warn("hello", attrs...)
 	logfmtSlog.Error("hello", attrs...)
 
-	consolefmt := fastlog.New(fastlog.Options{
-		Format: fastlog.ConsoleFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug,
-		ShowTimestamp: true,
-	})
+	consolefmt := fastlog.New(fastlog.Console(), fastlog.ShowDebugLogs(*debug))
+
 	fmt.Printf("\n# CONSOLE:\n\n")
 	consolefmt.Debug("hello", attrs...)
 	consolefmt.Info("hello", attrs...)
 	consolefmt.Warn("hello", attrs...)
 	consolefmt.Error("hello", attrs...)
-	consolefmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
+
+	consolefmt.Clone().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# CONSOLE (slog):\n\n")
 	consoleFmtSlog := consolefmt.Slog()
@@ -83,13 +79,14 @@ func main() {
 	consoleFmtSlog.Warn("hello", attrs...)
 	consoleFmtSlog.Error("hello", attrs...)
 
-	jsonfmt := fastlog.New(fastlog.Options{Format: fastlog.JSONFormat, ShowCaller: true, EnableColors: true, ShowDebugLogs: *debug})
+	jsonfmt := fastlog.New(fastlog.Json(), fastlog.ShowDebugLogs(*debug))
+
 	fmt.Printf("\n# JSON:\n\n")
 	jsonfmt.Debug("hello", attrs...)
 	jsonfmt.Info("hello", attrs...)
 	jsonfmt.Warn("hello", attrs...)
 	jsonfmt.Error("hello", attrs...)
-	jsonfmt.Clone(fastlog.Options{SkipCallerFrames: 0}).Info("hello [from clone]", attrs...)
+	jsonfmt.Clone().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# JSON (slog):\n\n")
 	jsonFmtSlog := jsonfmt.Slog()
