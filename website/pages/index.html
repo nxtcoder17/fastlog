@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Fastlog - Blazing Fast Go Logger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="fixed top-0 w-full bg-gray-900/80 backdrop-blur-md z-50 border-b border-gray-800">
+      {{- /* <nav class="container mx-auto px-6 py-4 flex justify-between items-center"> */}}
+      {{- /*   <h1 class="text-2xl font-bold gradient-text"> */}}
+      {{- /*     fastlog */}}
+      {{- /*   </h1> */}}
+      {{- /*   <div class="flex gap-6"> */}}
+      {{- /*     <NavLink href="#features">Features</NavLink> */}}
+      {{- /*     <NavLink href="#benchmarks">Benchmarks</NavLink> */}}
+      {{- /*     <NavLink href="#installation">Installation</NavLink> */}}
+      {{- /*     <NavLink href="https://github.com/nxtcoder17/fastlog">GitHub</NavLink> */}}
+      {{- /*   </div> */}}
+      {{- /* </nav> */}}
+    </header>
+    <!-- Hero Section -->
+    {{- /*     <section class="min-h-screen flex items-center justify-center px-6 pt-20"> */}}
+    {{- /*         <div class="container mx-auto text-center"> */}}
+    {{- /*             <div class="float-animation mb-8"> */}}
+    {{- /*                 <span class="text-6xl">⚡</span> */}}
+    {{- /*             </div> */}}
+    {{- /*             <h2 class="text-5xl md:text-7xl font-black mb-6"> */}}
+    {{- /*                 The <span class="gradient-text">Fastest</span> Go Logger */}}
+    {{- /*             </h2> */}}
+    {{- /*             <p class="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto"> */}}
+    {{- /*                 Zero-allocation, high-performance logging for Go applications.  */}}
+    {{- /*                 3-4x faster than popular alternatives with slog compatibility. */}}
+    {{- /*             </p> */}}
+    {{- /*             <div class="flex gap-4 justify-center"> */}}
+    {{- /*                 <button href="#installation" variant="primary">Get Started</button> */}}
+    {{- /*                 <button href="https://github.com/nxtcoder17/fastlog" variant="secondary">View on GitHub</button> */}}
+    {{- /*             </div> */}}
+    {{- /**/}}
+    {{- /*             <!-- Quick Start Code --> */}}
+    {{- /*             <div class="mt-16 max-w-3xl mx-auto"> */}}
+    {{- /*                 <CodeBlock><span class="text-purple-400">import</span> <span class="text-green-400">"github.com/nxtcoder17/fastlog"</span> */}}
+    {{- /**/}}
+    {{- /* <span class="text-gray-500">// Create a logger</span> */}}
+    {{- /* logger := fastlog.<span class="text-yellow-400">New</span>( */}}
+    {{- /*     fastlog.<span class="text-yellow-400">Console</span>(), */}}
+    {{- /*     fastlog.<span class="text-yellow-400">WithLogLevel</span>(slog.LevelDebug), */}}
+    {{- /* ) */}}
+    {{- /**/}}
+    {{- /* <span class="text-gray-500">// Start logging</span> */}}
+    {{- /* logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"server started"</span>, <span class="text-green-400">"port"</span>, <span class="text-blue-400">8080</span>)</CodeBlock> */}}
+    {{- /*             </div> */}}
+    {{- /*         </div> */}}
+    {{- /*     </section> */}}
+    {{- /**/}}
+    {{- /*     <!-- Features Section --> */}}
+    {{- /*     <section id="features" class="py-20 px-6"> */}}
+    {{- /*         <div class="container mx-auto"> */}}
+    {{- /*             <h3 class="text-4xl font-bold text-center mb-16">Why Fastlog?</h3> */}}
+    {{- /*             <div class="grid md:grid-cols-3 gap-8"> */}}
+    {{- /*                 <FeatureCard icon="🚀" title="Blazing Fast"> */}}
+    {{- /*                     Zero-allocation design with aggressive optimizations. 3-4x faster than zap, zerolog, and slog. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*                 <FeatureCard icon="🎯" title="Simple API"> */}}
+    {{- /*                     Clean, intuitive interface with builder pattern. Get started in seconds, not hours. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*                 <FeatureCard icon="🔧" title="slog Compatible"> */}}
+    {{- /*                     Drop-in replacement for slog handlers. Use with existing slog code without changes. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*                 <FeatureCard icon="📦" title="Zero Dependencies"> */}}
+    {{- /*                     Uses only Go standard library. No external dependencies to manage or worry about. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*                 <FeatureCard icon="🎨" title="Multiple Formats"> */}}
+    {{- /*                     Console with colors, JSON, and logfmt outputs. Choose what works for your use case. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*                 <FeatureCard icon="🔐" title="Thread Safe"> */}}
+    {{- /*                     Built-in synchronization for concurrent logging. Safe to use from multiple goroutines. */}}
+    {{- /*                 </FeatureCard> */}}
+    {{- /*             </div> */}}
+    {{- /*         </div> */}}
+    {{- /*     </section> */}}
+    {{- /**/}}
+    {{- /*     <!-- Benchmarks Section --> */}}
+    {{- /*     <section id="benchmarks" class="py-20 px-6 bg-gray-800/50"> */}}
+    {{- /*         <div class="container mx-auto"> */}}
+    {{- /*             <h3 class="text-4xl font-bold text-center mb-16">Performance That Matters</h3> */}}
+    {{- /**/}}
+    {{- /*             <div class="max-w-4xl mx-auto"> */}}
+    {{- /*                 <div class="bg-gray-800 rounded-lg p-8 mb-8"> */}}
+    {{- /*                     <h4 class="text-2xl font-bold mb-6 text-center">Speed Comparison (ns/op)</h4> */}}
+    {{- /*                     <div class="space-y-4"> */}}
+    {{- /*                         <BenchmarkBar name="Fastlog" value="1,458 ns/op" color="green" percentage="27" /> */}}
+    {{- /*                         <BenchmarkBar name="Zerolog" value="4,326 ns/op" color="yellow" percentage="82" /> */}}
+    {{- /*                         <BenchmarkBar name="slog" value="4,765 ns/op" color="orange" percentage="90" /> */}}
+    {{- /*                         <BenchmarkBar name="Zap (Sugar)" value="5,299 ns/op" color="red" percentage="100" /> */}}
+    {{- /*                     </div> */}}
+    {{- /*                 </div> */}}
+    {{- /**/}}
+    {{- /*                 <div class="grid md:grid-cols-2 gap-8"> */}}
+    {{- /*                     <div class="bg-gray-800 rounded-lg p-8"> */}}
+    {{- /*                         <h4 class="text-xl font-bold mb-4">Memory Allocations</h4> */}}
+    {{- /*                         <div class="text-3xl font-bold text-green-400 mb-2">14 allocs/op</div> */}}
+    {{- /*                         <p class="text-gray-400">vs 40+ for competitors</p> */}}
+    {{- /*                     </div> */}}
+    {{- /*                     <div class="bg-gray-800 rounded-lg p-8"> */}}
+    {{- /*                         <h4 class="text-xl font-bold mb-4">Benchmark Command</h4> */}}
+    {{- /*                         <CodeBlock>go test -bench=. -benchmem ./benchmark</CodeBlock> */}}
+    {{- /*                     </div> */}}
+    {{- /*                 </div> */}}
+    {{- /*             </div> */}}
+    {{- /*         </div> */}}
+    {{- /*     </section> */}}
+    {{- /**/}}
+    {{- /*     <!-- Installation Section --> */}}
+    {{- /*     <section id="installation" class="py-20 px-6"> */}}
+    {{- /*         <div class="container mx-auto max-w-4xl"> */}}
+    {{- /*             <h3 class="text-4xl font-bold text-center mb-16">Get Started in Seconds</h3> */}}
+    {{- /**/}}
+    {{- /*             <div class="space-y-12"> */}}
+    {{- /*                 <!-- Install --> */}}
+    {{- /*                 <div> */}}
+    {{- /*                     <h4 class="text-2xl font-bold mb-4">1. Install</h4> */}}
+    {{- /*                     <CodeBlock>go get github.com/nxtcoder17/fastlog</CodeBlock> */}}
+    {{- /*                 </div> */}}
+    {{- /**/}}
+    {{- /*                 <!-- Basic Usage --> */}}
+    {{- /*                 <div> */}}
+    {{- /*                     <h4 class="text-2xl font-bold mb-4">2. Basic Usage</h4> */}}
+    {{- /*                     <CodeBlock><span class="text-purple-400">package</span> main */}}
+    {{- /**/}}
+    {{- /* <span class="text-purple-400">import</span> ( */}}
+    {{- /*     <span class="text-green-400">"github.com/nxtcoder17/fastlog"</span> */}}
+    {{- /*     <span class="text-green-400">"log/slog"</span> */}}
+    {{- /* ) */}}
+    {{- /**/}}
+    {{- /* <span class="text-purple-400">func</span> <span class="text-yellow-400">main</span>() { */}}
+    {{- /*     <span class="text-gray-500">// Create a console logger</span> */}}
+    {{- /*     logger := fastlog.<span class="text-yellow-400">New</span>( */}}
+    {{- /*         fastlog.<span class="text-yellow-400">Console</span>(), */}}
+    {{- /*         fastlog.<span class="text-yellow-400">WithLogLevel</span>(slog.LevelInfo), */}}
+    {{- /*     ) */}}
+    {{- /**/}}
+    {{- /*     <span class="text-gray-500">// Log with native API</span> */}}
+    {{- /*     logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"application started"</span>) */}}
+    {{- /*     logger.<span class="text-yellow-400">Debug</span>(<span class="text-green-400">"debugging"</span>, <span class="text-green-400">"enabled"</span>, <span class="text-blue-400">true</span>) */}}
+    {{- /**/}}
+    {{- /*     <span class="text-gray-500">// Or use as slog handler</span> */}}
+    {{- /*     slogger := slog.<span class="text-yellow-400">New</span>(logger.<span class="text-yellow-400">SlogHandler</span>()) */}}
+    {{- /*     slogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"using slog API"</span>, <span class="text-green-400">"version"</span>, <span class="text-green-400">"1.0"</span>) */}}
+    {{- /* }</CodeBlock> */}}
+    {{- /*                 </div> */}}
+    {{- /**/}}
+    {{- /*                 <!-- Advanced Options --> */}}
+    {{- /*                 <div> */}}
+    {{- /*                     <h4 class="text-2xl font-bold mb-4">3. Advanced Configuration</h4> */}}
+    {{- /*                     <CodeBlock><span class="text-gray-500">// JSON output</span> */}}
+    {{- /* jsonLogger := fastlog.<span class="text-yellow-400">New</span>( */}}
+    {{- /*     fastlog.<span class="text-yellow-400">JSON</span>(), */}}
+    {{- /*     fastlog.<span class="text-yellow-400">WithTimestamp</span>(), */}}
+    {{- /* ) */}}
+    {{- /**/}}
+    {{- /* <span class="text-gray-500">// Logfmt output</span> */}}
+    {{- /* logfmtLogger := fastlog.<span class="text-yellow-400">New</span>( */}}
+    {{- /*     fastlog.<span class="text-yellow-400">Logfmt</span>(), */}}
+    {{- /*     fastlog.<span class="text-yellow-400">WithCaller</span>(), */}}
+    {{- /* ) */}}
+    {{- /**/}}
+    {{- /* <span class="text-gray-500">// With context</span> */}}
+    {{- /* userLogger := logger.<span class="text-yellow-400">With</span>(<span class="text-green-400">"user_id"</span>, <span class="text-blue-400">12345</span>) */}}
+    {{- /* userLogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"user action"</span>, <span class="text-green-400">"action"</span>, <span class="text-green-400">"login"</span>)</CodeBlock> */}}
+    {{- /*                 </div> */}}
+    {{- /*             </div> */}}
+    {{- /*         </div> */}}
+    {{- /*     </section> */}}
+    {{- /**/}}
+    {{- /*     <!-- Footer --> */}}
+    {{- /*     <footer class="py-12 px-6 border-t border-gray-800"> */}}
+    {{- /*         <div class="container mx-auto text-center"> */}}
+    {{- /*             <p class="text-gray-400 mb-4"> */}}
+    {{- /*                 Built with ❤️ for the Go community */}}
+    {{- /*             </p> */}}
+    {{- /*             <div class="flex gap-6 justify-center"> */}}
+    {{- /*                 <NavLink href="https://github.com/nxtcoder17/fastlog">GitHub</NavLink> */}}
+    {{- /*                 <NavLink href="https://pkg.go.dev/github.com/nxtcoder17/fastlog">Go Docs</NavLink> */}}
+    {{- /*                 <NavLink href="https://github.com/nxtcoder17/fastlog/issues">Issues</NavLink> */}}
+    {{- /*             </div> */}}
+    {{- /*         </div> */}}
+    {{- /*     </footer> */}}
+  </body>
+</html>
+

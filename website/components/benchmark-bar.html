@@ -1,0 +1,18 @@
+{{- define "BenchmarkBar" }}
+{{- /* @param name string */}}
+{{- /* @param value string */}}
+{{- /* @param color string (green|yellow|orange|red) */}}
+{{- /* @param percentage int */}}
+<div>
+  <div class="flex justify-between mb-2">
+    <span class="font-semibold">{{.name}}</span>
+    <span class="text-{{.color}}-400 font-mono">{{.value}}</span>
+  </div>
+  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+    <div class="bg-{{.color}}-500 h-full"
+         style="width: {{.percentage}}%">
+    </div>
+  </div>
+</div>
+{{- end }}
+

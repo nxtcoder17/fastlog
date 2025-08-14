@@ -1,0 +1,16 @@
+{{- define "FeatureCard" }}
+{{- /* @param icon string */}}
+{{- /* @param title string */}}
+<div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    {{.icon}}
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    {{.title}}
+  </h4>
+  <p class="text-gray-400">
+    <Children />
+  </p>
+</div>
+{{- end }}
+
