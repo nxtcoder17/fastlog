@@ -41,10 +41,8 @@ type Options struct {
 	Writer io.Writer
 	Format logformat
 
+	// LogLevel defaults to Info
 	LogLevel slog.Level
-
-	// ShowDebugLogs and LogLevel are mutually exclusive, as ShowDebugLogs set LogLevel to Debug regardless of LogLevel field being set or not
-	ShowDebugLogs bool
 
 	ShowCaller bool
 
@@ -76,7 +74,7 @@ func WithoutCaller() OptionFn {
 
 func ShowDebugLogs(enabled bool) OptionFn {
 	return func(opt *Options) {
-		opt.ShowDebugLogs = enabled
+		opt.LogLevel = slog.LevelDebug
 	}
 }
 
@@ -133,7 +131,6 @@ func New(options ...OptionFn) *Logger {
 		Writer:           os.Stderr,
 		Format:           logFormatConsole,
 		LogLevel:         slog.LevelInfo,
-		ShowDebugLogs:    false,
 		ShowCaller:       true,
 		ShowTimestamp:    true,
 		EnableColors:     true,

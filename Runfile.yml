@@ -18,4 +18,4 @@ tasks:
   example:
     interactive: true
     cmd:
-      - go run ./example/example.go
+      - go run ./example/example.go --debug
