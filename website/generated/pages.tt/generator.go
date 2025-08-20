@@ -1,0 +1,106 @@
+package main
+import (
+  html_template "github.com/nxtcoder17/htmlc/pkg/parser/html"
+  template_parser "github.com/nxtcoder17/htmlc/pkg/parser/template"
+  "os"
+  "path/filepath"
+  "fmt"
+  "runtime"
+  fn "github.com/nxtcoder17/htmlc/pkg/functions"
+)
+
+func dirExists(dir string) bool {
+  f, err := os.Stat(dir)
+  return err == nil && f.IsDir()
+}
+
+func main() {
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+	  panic("failed to get current file via runtime.Caller(0)")
+	}
+
+  outputDir := "/var/home/nxtcoder17/workspace/nxtcoder17/fastlog/website/generated/pages"
+
+	if err := os.RemoveAll(outputDir); err != nil {
+	  panic(err)
+	}
+
+  pagesInputDir := filepath.Join(filepath.Dir(currentFile), "../../pages")
+
+	getComponent := func(name string, attrs map[string]any) (html_template.Component, error) {
+		fmt.Printf("available templates: %+v\n", Components)
+		getc, ok := Components[name]
+		if !ok {
+			return nil, fmt.Errorf("unknown component (%s)", name)
+		}
+
+		c, err := getc(attrs)
+    if err != nil {
+      return nil, err
+    }
+
+		return c, nil
+	}
+
+	var listings []string
+
+  patterns := []string{"*.html"}
+
+
+	listings, err := fn.RecursiveLs(pagesInputDir, patterns)
+	if err != nil {
+	  panic(err)
+	}
+
+	if len(listings) == 0 {
+		panic(fmt.Errorf("template: pattern matches no files: %#q", patterns))
+	}
+
+	for i := range listings {
+	  entry := listings[i]
+		item := filepath.Join(pagesInputDir, entry)
+
+		input, err := os.Open(item)
+		if err != nil {
+			panic(err)
+		}
+
+    out := filepath.Join(outputDir, entry)
+
+	  if err := os.MkdirAll(filepath.Dir(out), 0o766); err != nil {
+		  panic(err)
+	  }
+
+		output, err := os.Create(out)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := html_template.Parse(html_template.Params{
+			Input:        input,
+			Output:       output,
+			Template:     Template,
+			GetComponent: getComponent,
+		}); err != nil {
+			panic(fmt.Errorf("parsing %s, failed with %w", item, err))
+		}
+	}
+
+  if false {
+	  p, err := template_parser.NewParser(template_parser.Html)
+	  if err != nil {
+	    panic(err)
+	  }
+
+	  structNamePrefix := "page"
+	  if err := p.ParseDir(outputDir, outputDir, "pages", template_parser.ParseOptions{
+	    GlobPatterns: patterns,
+	    StructNamePrefix: &structNamePrefix,
+	    GeneratingForComponents: false,
+	  }); err != nil {
+	    panic(err)
+	  }
+  }
+}
+

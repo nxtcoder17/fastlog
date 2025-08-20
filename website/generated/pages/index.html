@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Fastlog - Blazing Fast Go Logger</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap');
 
@@ -46,10 +39,18 @@
           fastlog
         </h1>
         <div class="flex gap-6">
-          <NavLink href="#features">Features</NavLink>
-          <NavLink href="#benchmarks">Benchmarks</NavLink>
-          <NavLink href="#installation">Installation</NavLink>
-          <NavLink href="https://github.com/nxtcoder17/fastlog">GitHub</NavLink>
+          <a href="#features" class="hover:text-purple-400 transition">
+  Features
+</a>
+          <a href="#benchmarks" class="hover:text-purple-400 transition">
+  Benchmarks
+</a>
+          <a href="#installation" class="hover:text-purple-400 transition">
+  Installation
+</a>
+          <a href="https://github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
+  GitHub
+</a>
         </div>
       </nav>
     </header>
@@ -67,60 +68,123 @@
           3-4x faster than popular alternatives with slog compatibility.
         </p>
         <div class="flex gap-4 justify-center">
-          <StyledButton href="#installation"
-                  variant="primary">
+          <a href="#installation" class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-semibold transition">
+  
             Get Started
-          </StyledButton>
-          <StyledButton href="https://github.com/nxtcoder17/fastlog"
-                  variant="secondary">
+          
+</a>
+          <a href="https://github.com/nxtcoder17/fastlog" class="border border-purple-600 hover:bg-purple-600/10 px-8 py-3 rounded-lg font-semibold transition">
+  
             View on GitHub
-          </StyledButton>
+          
+</a>
         </div>
         <!-- Quick Start Code -->
         <div class="mt-16 max-w-3xl mx-auto">
-        <CodeBlock><span class="text-purple-400">import</span> <span class="text-green-400">"github.com/nxtcoder17/fastlog"</span>
+        <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+  <span class="text-purple-400">import</span> <span class="text-green-400">&#34;github.com/nxtcoder17/fastlog&#34;</span>
         <span class="text-gray-500">// Create a logger</span>
         logger := fastlog.<span class="text-yellow-400">New</span>(
         fastlog.<span class="text-yellow-400">Console</span>(),
         fastlog.<span class="text-yellow-400">WithLogLevel</span>(slog.LevelDebug),
         )
         <span class="text-gray-500">// Start logging</span>
-        logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"server started"</span>, <span class="text-green-400">"port"</span>, <span class="text-blue-400">8080</span>)</CodeBlock>
+        logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;server started&#34;</span>, <span class="text-green-400">&#34;port&#34;</span>, <span class="text-blue-400">8080</span>)
+  </code>
+</pre>
       </div>
     </div>
   </section>
   <!-- Features Section -->
-  <section id="features"
-           class="py-20 px-6">
+  <section id="features" class="py-20 px-6">
     <div class="container mx-auto">
       <h3 class="text-4xl font-bold text-center mb-16">
         Why Fastlog?
       </h3>
       <div class="grid md:grid-cols-3 gap-8">
-        <FeatureCard icon="🚀" title="Blazing Fast">
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    🚀
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    Blazing Fast
+  </h4>
+  <p class="text-gray-400">
+    
         Zero-allocation design with aggressive optimizations. 3-4x faster than zap, zerolog, and slog.
-        </FeatureCard>
-        <FeatureCard icon="🎯" title="Simple API">
+        
+  </p>
+</div>
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    🎯
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    Simple API
+  </h4>
+  <p class="text-gray-400">
+    
         Clean, intuitive interface with builder pattern. Get started in seconds, not hours.
-        </FeatureCard>
-        <FeatureCard icon="🔧" title="slog Compatible">
+        
+  </p>
+</div>
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    🔧
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    slog Compatible
+  </h4>
+  <p class="text-gray-400">
+    
         Drop-in replacement for slog handlers. Use with existing slog code without changes.
-        </FeatureCard>
-        <FeatureCard icon="📦" title="Zero Dependencies">
+        
+  </p>
+</div>
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    📦
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    Zero Dependencies
+  </h4>
+  <p class="text-gray-400">
+    
         Uses only Go standard library. No external dependencies to manage or worry about.
-        </FeatureCard>
-        <FeatureCard icon="🎨" title="Multiple Formats">
+        
+  </p>
+</div>
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    🎨
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    Multiple Formats
+  </h4>
+  <p class="text-gray-400">
+    
         Console with colors, JSON, and logfmt outputs. Choose what works for your use case.
-        </FeatureCard>
-        <FeatureCard icon="🔐" title="Thread Safe">
+        
+  </p>
+</div>
+        <div class="feature-card p-8 rounded-xl">
+  <div class="text-4xl mb-4">
+    🔐
+  </div>
+  <h4 class="text-2xl font-bold mb-3">
+    Thread Safe
+  </h4>
+  <p class="text-gray-400">
+    
         Built-in synchronization for concurrent logging. Safe to use from multiple goroutines.
-        </FeatureCard>
+        
+  </p>
+</div>
       </div>
     </div>
   </section>
   <!-- Benchmarks Section -->
-  <section id="benchmarks"
-           class="py-20 px-6 bg-gray-800/50">
+  <section id="benchmarks" class="py-20 px-6 bg-gray-800/50">
     <div class="container mx-auto">
       <h3 class="text-4xl font-bold text-center mb-16">
         Performance That Matters
@@ -131,10 +195,46 @@
             Speed Comparison (ns/op)
           </h4>
           <div class="space-y-4">
-            <BenchmarkBar name="Fastlog" value="1,458 ns/op" color="green" percentage="27" />
-            <BenchmarkBar name="Zerolog" value="4,326 ns/op" color="yellow" percentage="82" />
-            <BenchmarkBar name="slog" value="4,765 ns/op" color="orange" percentage="90" />
-            <BenchmarkBar name="Zap (Sugar)" value="5,299 ns/op" color="red" percentage="100" />
+            <div>
+  <div class="flex justify-between mb-2">
+    <span class="font-semibold">Fastlog</span>
+    <span class="text-green-400 font-mono">1,458 ns/op</span>
+  </div>
+  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+    <div class="bg-green-500 h-full" style="width: 27%">
+    </div>
+  </div>
+</div>
+            <div>
+  <div class="flex justify-between mb-2">
+    <span class="font-semibold">Zerolog</span>
+    <span class="text-yellow-400 font-mono">4,326 ns/op</span>
+  </div>
+  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+    <div class="bg-yellow-500 h-full" style="width: 82%">
+    </div>
+  </div>
+</div>
+            <div>
+  <div class="flex justify-between mb-2">
+    <span class="font-semibold">slog</span>
+    <span class="text-orange-400 font-mono">4,765 ns/op</span>
+  </div>
+  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+    <div class="bg-orange-500 h-full" style="width: 90%">
+    </div>
+  </div>
+</div>
+            <div>
+  <div class="flex justify-between mb-2">
+    <span class="font-semibold">Zap (Sugar)</span>
+    <span class="text-red-400 font-mono">5,299 ns/op</span>
+  </div>
+  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+    <div class="bg-red-500 h-full" style="width: 100%">
+    </div>
+  </div>
+</div>
           </div>
         </div>
         <div class="grid md:grid-cols-2 gap-8">
@@ -153,15 +253,17 @@
             <h4 class="text-xl font-bold mb-4">
               Benchmark Command
             </h4>
-            <CodeBlock>go test -bench=. -benchmem ./benchmark</CodeBlock>
+            <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+  go test -bench=. -benchmem ./benchmark
+  </code>
+</pre>
           </div>
         </div>
       </div>
     </div>
   </section>
   <!-- Installation Section -->
-  <section id="installation"
-           class="py-20 px-6">
+  <section id="installation" class="py-20 px-6">
     <div class="container mx-auto max-w-4xl">
       <h3 class="text-4xl font-bold text-center mb-16">
         Get Started in Seconds
@@ -172,17 +274,21 @@
           <h4 class="text-2xl font-bold mb-4">
             1. Install
           </h4>
-          <CodeBlock>go get github.com/nxtcoder17/fastlog</CodeBlock>
+          <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+  go get github.com/nxtcoder17/fastlog
+  </code>
+</pre>
         </div>
         <!-- Basic Usage -->
         <div>
           <h4 class="text-2xl font-bold mb-4">
             2. Basic Usage
           </h4>
-          <CodeBlock><span class="text-purple-400">package</span> main
+          <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+  <span class="text-purple-400">package</span> main
           <span class="text-purple-400">import</span> (
-          <span class="text-green-400">"github.com/nxtcoder17/fastlog"</span>
-          <span class="text-green-400">"log/slog"</span>
+          <span class="text-green-400">&#34;github.com/nxtcoder17/fastlog&#34;</span>
+          <span class="text-green-400">&#34;log/slog&#34;</span>
           )
           <span class="text-purple-400">func</span> <span class="text-yellow-400">main</span>() {
           <span class="text-gray-500">// Create a console logger</span>
@@ -191,19 +297,22 @@
           fastlog.<span class="text-yellow-400">WithLogLevel</span>(slog.LevelInfo),
           )
           <span class="text-gray-500">// Log with native API</span>
-          logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"application started"</span>)
-          logger.<span class="text-yellow-400">Debug</span>(<span class="text-green-400">"debugging"</span>, <span class="text-green-400">"enabled"</span>, <span class="text-blue-400">true</span>)
+          logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;application started&#34;</span>)
+          logger.<span class="text-yellow-400">Debug</span>(<span class="text-green-400">&#34;debugging&#34;</span>, <span class="text-green-400">&#34;enabled&#34;</span>, <span class="text-blue-400">true</span>)
           <span class="text-gray-500">// Or use as slog handler</span>
           slogger := slog.<span class="text-yellow-400">New</span>(logger.<span class="text-yellow-400">SlogHandler</span>())
-          slogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"using slog API"</span>, <span class="text-green-400">"version"</span>, <span class="text-green-400">"1.0"</span>)
-          }</CodeBlock>
+          slogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;using slog API&#34;</span>, <span class="text-green-400">&#34;version&#34;</span>, <span class="text-green-400">&#34;1.0&#34;</span>)
+          }
+  </code>
+</pre>
         </div>
         <!-- Advanced Options -->
         <div>
           <h4 class="text-2xl font-bold mb-4">
             3. Advanced Configuration
           </h4>
-        <CodeBlock><span class="text-gray-500">// JSON output</span>
+        <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+  <span class="text-gray-500">// JSON output</span>
         jsonLogger := fastlog.<span class="text-yellow-400">New</span>(
         fastlog.<span class="text-yellow-400">JSON</span>(),
         fastlog.<span class="text-yellow-400">WithTimestamp</span>(),
@@ -214,8 +323,10 @@
         fastlog.<span class="text-yellow-400">WithCaller</span>(),
         )
         <span class="text-gray-500">// With context</span>
-        userLogger := logger.<span class="text-yellow-400">With</span>(<span class="text-green-400">"user_id"</span>, <span class="text-blue-400">12345</span>)
-        userLogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">"user action"</span>, <span class="text-green-400">"action"</span>, <span class="text-green-400">"login"</span>)</CodeBlock>
+        userLogger := logger.<span class="text-yellow-400">With</span>(<span class="text-green-400">&#34;user_id&#34;</span>, <span class="text-blue-400">12345</span>)
+        userLogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;user action&#34;</span>, <span class="text-green-400">&#34;action&#34;</span>, <span class="text-green-400">&#34;login&#34;</span>)
+  </code>
+</pre>
       </div>
     </div>
   </div>
@@ -227,11 +338,18 @@
       Built with ❤️ for the Go community
     </p>
     <div class="flex gap-6 justify-center">
-      <NavLink href="https://github.com/nxtcoder17/fastlog">GitHub</NavLink>
-      <NavLink href="https://pkg.go.dev/github.com/nxtcoder17/fastlog">Go Docs</NavLink>
-      <NavLink href="https://github.com/nxtcoder17/fastlog/issues">Issues</NavLink>
+      <a href="https://github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
+  GitHub
+</a>
+      <a href="https://pkg.go.dev/github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
+  Go Docs
+</a>
+      <a href="https://github.com/nxtcoder17/fastlog/issues" class="hover:text-purple-400 transition">
+  Issues
+</a>
     </div>
   </div>
 </footer>
-</body>
-</html>
+
+
+</body></html>
