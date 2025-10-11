@@ -1,11 +1,18 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
     <title>Fastlog - Blazing Fast Go Logger</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"
+          rel="stylesheet" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap');
 
@@ -39,18 +46,22 @@
           fastlog
         </h1>
         <div class="flex gap-6">
-          <a href="#features" class="hover:text-purple-400 transition">
-  Features
-</a>
-          <a href="#benchmarks" class="hover:text-purple-400 transition">
-  Benchmarks
-</a>
-          <a href="#installation" class="hover:text-purple-400 transition">
-  Installation
-</a>
-          <a href="https://github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
-  GitHub
-</a>
+          <a href="#features"
+             class="hover:text-purple-400 transition">
+            Features
+          </a>
+          <a href="#benchmarks"
+             class="hover:text-purple-400 transition">
+            Benchmarks
+          </a>
+          <a href="#installation"
+             class="hover:text-purple-400 transition">
+            Installation
+          </a>
+          <a href="https://github.com/nxtcoder17/fastlog"
+             class="hover:text-purple-400 transition">
+            GitHub
+          </a>
         </div>
       </nav>
     </header>
@@ -68,20 +79,18 @@
           3-4x faster than popular alternatives with slog compatibility.
         </p>
         <div class="flex gap-4 justify-center">
-          <a href="#installation" class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-semibold transition">
-  
+          <a href="#installation"
+             class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-semibold transition">
             Get Started
-          
-</a>
-          <a href="https://github.com/nxtcoder17/fastlog" class="border border-purple-600 hover:bg-purple-600/10 px-8 py-3 rounded-lg font-semibold transition">
-  
+          </a>
+          <a href="https://github.com/nxtcoder17/fastlog"
+             class="border border-purple-600 hover:bg-purple-600/10 px-8 py-3 rounded-lg font-semibold transition">
             View on GitHub
-          
-</a>
+          </a>
         </div>
         <!-- Quick Start Code -->
         <div class="mt-16 max-w-3xl mx-auto">
-        <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+          <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
   <span class="text-purple-400">import</span> <span class="text-green-400">&#34;github.com/nxtcoder17/fastlog&#34;</span>
         <span class="text-gray-500">// Create a logger</span>
         logger := fastlog.<span class="text-yellow-400">New</span>(
@@ -92,199 +101,194 @@
         logger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;server started&#34;</span>, <span class="text-green-400">&#34;port&#34;</span>, <span class="text-blue-400">8080</span>)
   </code>
 </pre>
-      </div>
-    </div>
-  </section>
-  <!-- Features Section -->
-  <section id="features" class="py-20 px-6">
-    <div class="container mx-auto">
-      <h3 class="text-4xl font-bold text-center mb-16">
-        Why Fastlog?
-      </h3>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    🚀
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    Blazing Fast
-  </h4>
-  <p class="text-gray-400">
-    
-        Zero-allocation design with aggressive optimizations. 3-4x faster than zap, zerolog, and slog.
-        
-  </p>
-</div>
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    🎯
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    Simple API
-  </h4>
-  <p class="text-gray-400">
-    
-        Clean, intuitive interface with builder pattern. Get started in seconds, not hours.
-        
-  </p>
-</div>
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    🔧
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    slog Compatible
-  </h4>
-  <p class="text-gray-400">
-    
-        Drop-in replacement for slog handlers. Use with existing slog code without changes.
-        
-  </p>
-</div>
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    📦
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    Zero Dependencies
-  </h4>
-  <p class="text-gray-400">
-    
-        Uses only Go standard library. No external dependencies to manage or worry about.
-        
-  </p>
-</div>
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    🎨
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    Multiple Formats
-  </h4>
-  <p class="text-gray-400">
-    
-        Console with colors, JSON, and logfmt outputs. Choose what works for your use case.
-        
-  </p>
-</div>
-        <div class="feature-card p-8 rounded-xl">
-  <div class="text-4xl mb-4">
-    🔐
-  </div>
-  <h4 class="text-2xl font-bold mb-3">
-    Thread Safe
-  </h4>
-  <p class="text-gray-400">
-    
-        Built-in synchronization for concurrent logging. Safe to use from multiple goroutines.
-        
-  </p>
-</div>
-      </div>
-    </div>
-  </section>
-  <!-- Benchmarks Section -->
-  <section id="benchmarks" class="py-20 px-6 bg-gray-800/50">
-    <div class="container mx-auto">
-      <h3 class="text-4xl font-bold text-center mb-16">
-        Performance That Matters
-      </h3>
-      <div class="max-w-4xl mx-auto">
-        <div class="bg-gray-800 rounded-lg p-8 mb-8">
-          <h4 class="text-2xl font-bold mb-6 text-center">
-            Speed Comparison (ns/op)
-          </h4>
-          <div class="space-y-4">
-            <div>
-  <div class="flex justify-between mb-2">
-    <span class="font-semibold">Fastlog</span>
-    <span class="text-green-400 font-mono">1,458 ns/op</span>
-  </div>
-  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
-    <div class="bg-green-500 h-full" style="width: 27%">
-    </div>
-  </div>
-</div>
-            <div>
-  <div class="flex justify-between mb-2">
-    <span class="font-semibold">Zerolog</span>
-    <span class="text-yellow-400 font-mono">4,326 ns/op</span>
-  </div>
-  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
-    <div class="bg-yellow-500 h-full" style="width: 82%">
-    </div>
-  </div>
-</div>
-            <div>
-  <div class="flex justify-between mb-2">
-    <span class="font-semibold">slog</span>
-    <span class="text-orange-400 font-mono">4,765 ns/op</span>
-  </div>
-  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
-    <div class="bg-orange-500 h-full" style="width: 90%">
-    </div>
-  </div>
-</div>
-            <div>
-  <div class="flex justify-between mb-2">
-    <span class="font-semibold">Zap (Sugar)</span>
-    <span class="text-red-400 font-mono">5,299 ns/op</span>
-  </div>
-  <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
-    <div class="bg-red-500 h-full" style="width: 100%">
-    </div>
-  </div>
-</div>
-          </div>
         </div>
-        <div class="grid md:grid-cols-2 gap-8">
-          <div class="bg-gray-800 rounded-lg p-8">
-            <h4 class="text-xl font-bold mb-4">
-              Memory Allocations
-            </h4>
-            <div class="text-3xl font-bold text-green-400 mb-2">
-              14 allocs/op
+      </div>
+    </section>
+    <!-- Features Section -->
+    <section id="features"
+             class="py-20 px-6">
+      <div class="container mx-auto">
+        <h3 class="text-4xl font-bold text-center mb-16">
+          Why Fastlog?
+        </h3>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              🚀
             </div>
+            <h4 class="text-2xl font-bold mb-3">
+              Blazing Fast
+            </h4>
             <p class="text-gray-400">
-              vs 40+ for competitors
+              Zero-allocation design with aggressive optimizations. 3-4x faster than zap, zerolog, and slog.
             </p>
           </div>
-          <div class="bg-gray-800 rounded-lg p-8">
-            <h4 class="text-xl font-bold mb-4">
-              Benchmark Command
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              🎯
+            </div>
+            <h4 class="text-2xl font-bold mb-3">
+              Simple API
             </h4>
-            <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+            <p class="text-gray-400">
+              Clean, intuitive interface with builder pattern. Get started in seconds, not hours.
+            </p>
+          </div>
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              🔧
+            </div>
+            <h4 class="text-2xl font-bold mb-3">
+              slog Compatible
+            </h4>
+            <p class="text-gray-400">
+              Drop-in replacement for slog handlers. Use with existing slog code without changes.
+            </p>
+          </div>
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              📦
+            </div>
+            <h4 class="text-2xl font-bold mb-3">
+              Zero Dependencies
+            </h4>
+            <p class="text-gray-400">
+              Uses only Go standard library. No external dependencies to manage or worry about.
+            </p>
+          </div>
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              🎨
+            </div>
+            <h4 class="text-2xl font-bold mb-3">
+              Multiple Formats
+            </h4>
+            <p class="text-gray-400">
+              Console with colors, JSON, and logfmt outputs. Choose what works for your use case.
+            </p>
+          </div>
+          <div class="feature-card p-8 rounded-xl">
+            <div class="text-4xl mb-4">
+              🔐
+            </div>
+            <h4 class="text-2xl font-bold mb-3">
+              Thread Safe
+            </h4>
+            <p class="text-gray-400">
+              Built-in synchronization for concurrent logging. Safe to use from multiple goroutines.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Benchmarks Section -->
+    <section id="benchmarks"
+             class="py-20 px-6 bg-gray-800/50">
+      <div class="container mx-auto">
+        <h3 class="text-4xl font-bold text-center mb-16">
+          Performance That Matters
+        </h3>
+        <div class="max-w-4xl mx-auto">
+          <div class="bg-gray-800 rounded-lg p-8 mb-8">
+            <h4 class="text-2xl font-bold mb-6 text-center">
+              Speed Comparison (ns/op)
+            </h4>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-semibold">Fastlog</span>
+                  <span class="text-green-400 font-mono">1,458 ns/op</span>
+                </div>
+                <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+                  <div class="bg-green-500 h-full"
+                       style="width: 27%">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-semibold">Zerolog</span>
+                  <span class="text-yellow-400 font-mono">4,326 ns/op</span>
+                </div>
+                <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+                  <div class="bg-yellow-500 h-full"
+                       style="width: 82%">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-semibold">slog</span>
+                  <span class="text-orange-400 font-mono">4,765 ns/op</span>
+                </div>
+                <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+                  <div class="bg-orange-500 h-full"
+                       style="width: 90%">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-semibold">Zap (Sugar)</span>
+                  <span class="text-red-400 font-mono">5,299 ns/op</span>
+                </div>
+                <div class="bg-gray-700 rounded-full h-8 relative overflow-hidden">
+                  <div class="bg-red-500 h-full"
+                       style="width: 100%">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-gray-800 rounded-lg p-8">
+              <h4 class="text-xl font-bold mb-4">
+                Memory Allocations
+              </h4>
+              <div class="text-3xl font-bold text-green-400 mb-2">
+                14 allocs/op
+              </div>
+              <p class="text-gray-400">
+                vs 40+ for competitors
+              </p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-8">
+              <h4 class="text-xl font-bold mb-4">
+                Benchmark Command
+              </h4>
+              <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
   go test -bench=. -benchmem ./benchmark
   </code>
 </pre>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-  <!-- Installation Section -->
-  <section id="installation" class="py-20 px-6">
-    <div class="container mx-auto max-w-4xl">
-      <h3 class="text-4xl font-bold text-center mb-16">
-        Get Started in Seconds
-      </h3>
-      <div class="space-y-12">
-        <!-- Install -->
-        <div>
-          <h4 class="text-2xl font-bold mb-4">
-            1. Install
-          </h4>
-          <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+    </section>
+    <!-- Installation Section -->
+    <section id="installation"
+             class="py-20 px-6">
+      <div class="container mx-auto max-w-4xl">
+        <h3 class="text-4xl font-bold text-center mb-16">
+          Get Started in Seconds
+        </h3>
+        <div class="space-y-12">
+          <!-- Install -->
+          <div>
+            <h4 class="text-2xl font-bold mb-4">
+              1. Install
+            </h4>
+            <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
   go get github.com/nxtcoder17/fastlog
   </code>
 </pre>
-        </div>
-        <!-- Basic Usage -->
-        <div>
-          <h4 class="text-2xl font-bold mb-4">
-            2. Basic Usage
-          </h4>
-          <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+          </div>
+          <!-- Basic Usage -->
+          <div>
+            <h4 class="text-2xl font-bold mb-4">
+              2. Basic Usage
+            </h4>
+            <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
   <span class="text-purple-400">package</span> main
           <span class="text-purple-400">import</span> (
           <span class="text-green-400">&#34;github.com/nxtcoder17/fastlog&#34;</span>
@@ -305,13 +309,13 @@
           }
   </code>
 </pre>
-        </div>
-        <!-- Advanced Options -->
-        <div>
-          <h4 class="text-2xl font-bold mb-4">
-            3. Advanced Configuration
-          </h4>
-        <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
+          </div>
+          <!-- Advanced Options -->
+          <div>
+            <h4 class="text-2xl font-bold mb-4">
+              3. Advanced Configuration
+            </h4>
+            <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">  <code class="text-sm">
   <span class="text-gray-500">// JSON output</span>
         jsonLogger := fastlog.<span class="text-yellow-400">New</span>(
         fastlog.<span class="text-yellow-400">JSON</span>(),
@@ -327,29 +331,32 @@
         userLogger.<span class="text-yellow-400">Info</span>(<span class="text-green-400">&#34;user action&#34;</span>, <span class="text-green-400">&#34;action&#34;</span>, <span class="text-green-400">&#34;login&#34;</span>)
   </code>
 </pre>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-<!-- Footer -->
-<footer class="py-12 px-6 border-t border-gray-800">
-  <div class="container mx-auto text-center">
-    <p class="text-gray-400 mb-4">
-      Built with ❤️ for the Go community
-    </p>
-    <div class="flex gap-6 justify-center">
-      <a href="https://github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
-  GitHub
-</a>
-      <a href="https://pkg.go.dev/github.com/nxtcoder17/fastlog" class="hover:text-purple-400 transition">
-  Go Docs
-</a>
-      <a href="https://github.com/nxtcoder17/fastlog/issues" class="hover:text-purple-400 transition">
-  Issues
-</a>
-    </div>
-  </div>
-</footer>
+    </section>
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+      <div class="container mx-auto text-center">
+        <p class="text-gray-400 mb-4">
+          Built with ❤️ for the Go community
+        </p>
+        <div class="flex gap-6 justify-center">
+          <a href="https://github.com/nxtcoder17/fastlog"
+             class="hover:text-purple-400 transition">
+            GitHub
+          </a>
+          <a href="https://pkg.go.dev/github.com/nxtcoder17/fastlog"
+             class="hover:text-purple-400 transition">
+            Go Docs
+          </a>
+          <a href="https://github.com/nxtcoder17/fastlog/issues"
+             class="hover:text-purple-400 transition">
+            Issues
+          </a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
 
-
-</body></html>

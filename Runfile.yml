@@ -19,3 +19,8 @@ tasks:
     interactive: true
     cmd:
       - go run ./example/example.go
+
+  example:debug:
+    interactive: true
+    cmd:
+      - go run ./example/example.go --debug

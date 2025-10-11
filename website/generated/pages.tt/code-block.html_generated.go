@@ -20,10 +20,10 @@ func init() {
 
 func parseCodeBlock() error {
 	_, err := Template.Parse(`{{- define "CodeBlock" }}
-{{- /* @param language? string */}}
+{{- /* @param lang? string */}}
 <pre class="bg-gray-800 rounded-lg p-6 text-left overflow-x-auto">
-  <code class="text-sm">
-  <Children />
+  <code class='shj-lang-[{{.lang}}]'>
+    <Children />
   </code>
 </pre>
 {{- end }}
@@ -32,6 +32,7 @@ func parseCodeBlock() error {
 }
 
 type CodeBlock struct {
+	Lang any `json:"lang" validate:"required"`
 
 	// raw field contains all the
 	// - known attributes (i.e. those defined above this line)
@@ -58,7 +59,9 @@ func NewCodeBlock(attrs map[string]any) (*CodeBlock, error) {
 		fmt.Println("Validation failed:", err)
 	}
 
-	known := map[string]any{}
+	known := map[string]any{
+		"lang": attrs["lang"],
+	}
 
 	var unknown []string
 
