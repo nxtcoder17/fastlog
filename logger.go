@@ -74,7 +74,9 @@ func WithoutCaller() OptionFn {
 
 func ShowDebugLogs(enabled bool) OptionFn {
 	return func(opt *Options) {
-		opt.LogLevel = slog.LevelDebug
+		if enabled {
+			opt.LogLevel = slog.LevelDebug
+		}
 	}
 }
 
