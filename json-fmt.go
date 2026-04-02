@@ -6,7 +6,9 @@ import (
 
 type jsonLogger struct {
 	kv []any
-	*loggerProps
+	prefix string
+	opts *Options
+	pool *Pool
 }
 
 // Debug implements loggerAPI.
@@ -30,46 +32,46 @@ func (j *jsonLogger) Warn(msg string, kv ...any) {
 }
 
 // With implements loggerAPI.
-func (j *jsonLogger) With(kv ...any) *Logger {
-	return &Logger{
-		loggerAPI: &jsonLogger{
-			kv: kv,
-			loggerProps: &loggerProps{
-				attrs:   j.loggerProps.attrs,
-				prefix:  j.loggerProps.prefix,
-				pool:    j.loggerProps.pool,
-				Options: j.loggerProps.Options,
-			},
-		},
+func (j *jsonLogger) With(kv ...any) Logger {
+	newKVs := make([]any, 0, len(kv) + len(j.kv))
+	newKVs = append(newKVs, j.kv...)
+	newKVs = append(newKVs, kv...)
+
+	return &jsonLogger{
+		kv: newKVs,
+		prefix:  j.prefix,
+		pool:    j.pool,
+		opts: j.opts,
 	}
 }
 
 // Slog implements loggerAPI.
 func (j *jsonLogger) Slog() *slog.Logger {
-	return slog.New(&jsonLoggerSlog{j.loggerProps})
+	kv := make([]slog.Attr, 0, len(j.kv))
+	for i := 1; i < len(j.kv); i++ {
+		kv = append(kv, slog.Any(j.kv[i-1].(string), j.kv[i]))
+	}
+
+	return slog.New(&jsonLoggerSlog{
+		kv: kv,
+		prefix: j.prefix,
+		pool: j.pool,
+		opts: j.opts,
+	})
 }
 
 // Clone implements loggerAPI.
-func (c *jsonLogger) Clone(options ...OptionFn) *Logger {
-	opts := c.loggerProps.Options.clone(options...)
-
-	return &Logger{
-		loggerAPI: &jsonLogger{
-			kv: c.kv,
-			loggerProps: &loggerProps{
-				attrs:   c.loggerProps.attrs,
-				prefix:  c.loggerProps.prefix,
-				pool:    NewPool(&opts),
-				Options: opts,
-			},
-		},
+func (j *jsonLogger) Clone() *loggerBuilder {
+	return &loggerBuilder{
+		options: j.opts,
+		prefix: j.prefix,
 	}
 }
 
-var _ loggerAPI = (*jsonLogger)(nil)
+var _ Logger = (*jsonLogger)(nil)
 
 func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
-	if level < j.LogLevel {
+	if level < j.opts.LogLevel {
 		return nil
 	}
 
@@ -77,7 +79,7 @@ func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
 
 	buf.Append("{")
 
-	buf.AppendCaller(2 + j.SkipCallerFrames)
+	buf.AppendCaller(2 + j.opts.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(level)
@@ -98,7 +100,7 @@ func (j *jsonLogger) handleLog(level slog.Level, msg string, kv ...any) error {
 	buf.Append('}')
 	buf.Append('\n')
 
-	_, err := j.Writer.Write(buf.Bytes())
+	_, err := j.opts.Writer.Write(buf.Bytes())
 	j.pool.Put(buf)
 	return err
 }

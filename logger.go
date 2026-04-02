@@ -5,22 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"time"
-)
-
-type loggerProps struct {
-	attrs  []slog.Attr
-	prefix string
-	pool   *Pool
-
-	Options
-}
-
-type logformat string
-
-const (
-	logFormatConsole logformat = "console"
-	logFormatJSON    logformat = "json"
-	logFormatLogFmt  logformat = "logfmt"
+	"github.com/nxtcoder17/fastlog/types"
 )
 
 var (
@@ -39,144 +24,149 @@ var (
 
 type Options struct {
 	Writer io.Writer
-	Format logformat
+	Format types.LogFormat
 
 	// LogLevel defaults to Info
 	LogLevel slog.Level
 
-	ShowCaller bool
+	WithCaller bool
 
-	ShowTimestamp bool
-	EnableColors  bool
+	WithTimestamp bool
+	WithColors  bool
 
 	SkipCallerFrames int
+	VerbosityLevel int
 }
 
-type OptionFn func(opt *Options)
-
-func WithWriter(writer io.Writer) OptionFn {
-	return func(opt *Options) {
-		opt.Writer = writer
-	}
-}
-
-func WithLogLevel(level slog.Level) OptionFn {
-	return func(opt *Options) {
-		opt.LogLevel = level
-	}
-}
-
-func WithoutCaller() OptionFn {
-	return func(opt *Options) {
-		opt.ShowCaller = false
+func New() *loggerBuilder {
+	return &loggerBuilder{
+		options: &Options{
+			Writer: &syncWriter{writer: os.Stderr},
+			Format: types.LogFormatConsole,
+			LogLevel: slog.LevelInfo,
+			WithCaller: true,
+			WithTimestamp: true,
+			WithColors: true,
+			VerbosityLevel: 1,
+		},
 	}
 }
 
-func ShowDebugLogs(enabled bool) OptionFn {
-	return func(opt *Options) {
-		if enabled {
-			opt.LogLevel = slog.LevelDebug
-		}
+func (l *loggerBuilder) JSON() Logger {
+	return &jsonLogger{
+		kv: nil, 
+		prefix: l.prefix,
+		opts: l.options,
+		pool: newPool(&bufferPoolOptions{
+			WithTimestamp: l.options.WithTimestamp,
+			WithCaller: l.options.WithCaller,
+			WithColors: l.options.WithColors,
+			LogFormat: types.LogFormatJSON,
+		}),
 	}
 }
 
-func SkipCallerFrames(count int) OptionFn {
-	return func(opt *Options) {
-		opt.SkipCallerFrames = count
+func (l *loggerBuilder) Logfmt() Logger {
+	return &logfmtLogger{
+		kv: nil,
+		opts: l.options,
+		pool: newPool(&bufferPoolOptions{
+			WithTimestamp: l.options.WithTimestamp,
+			WithCaller: l.options.WithCaller,
+			WithColors: l.options.WithColors,
+			LogFormat: types.LogFormatLogfmt,
+		}),
 	}
 }
 
-func Json() OptionFn {
-	return func(opt *Options) {
-		opt.Format = logFormatJSON
+func (l *loggerBuilder) Console() Logger {
+	return &consoleLogger{
+		kv: nil,
+		opts: l.options,
+		pool: newPool(&bufferPoolOptions{
+			WithTimestamp: l.options.WithTimestamp,
+			WithCaller: l.options.WithCaller,
+			WithColors: l.options.WithColors,
+			LogFormat: types.LogFormatConsole,
+		}),
 	}
 }
 
-func Logfmt() OptionFn {
-	return func(opt *Options) {
-		opt.Format = logFormatLogFmt
-	}
+func (l *loggerBuilder) Writer(writer io.Writer) *loggerBuilder {
+	l.options.Writer = &syncWriter{writer: writer}
+	return l
 }
 
-func Console() OptionFn {
-	return func(opt *Options) {
-		opt.Format = logFormatConsole
-	}
+func (l *loggerBuilder) Prefix(p string) *loggerBuilder {
+	l.prefix = p
+	return l
 }
 
-func WithoutColors() OptionFn {
-	return func(opt *Options) {
-		opt.EnableColors = false
-	}
+func (l *loggerBuilder) Timestamp(show bool) *loggerBuilder {
+	l.options.WithTimestamp = show
+	return l
 }
 
-func WithoutTimestamp() OptionFn {
-	return func(opt *Options) {
-		opt.ShowTimestamp = false
-	}
+func (l *loggerBuilder) Caller(show bool) *loggerBuilder {
+	l.options.WithCaller = show
+	return l
 }
 
-func (opts Options) clone(options ...OptionFn) Options {
-	for _, optFn := range options {
-		optFn(&opts)
-	}
-
-	if _, ok := opts.Writer.(*syncWriter); !ok {
-		opts.Writer = &syncWriter{writer: opts.Writer}
-	}
-
-	return opts
+func (l *loggerBuilder) Colors(show bool) *loggerBuilder {
+	l.options.WithColors = show
+	return l
 }
 
-func New(options ...OptionFn) *Logger {
-	opts := Options{
-		Writer:           os.Stderr,
-		Format:           logFormatConsole,
-		LogLevel:         slog.LevelInfo,
-		ShowCaller:       true,
-		ShowTimestamp:    true,
-		EnableColors:     true,
-		SkipCallerFrames: 0,
-	}
-
-	for _, optFn := range options {
-		optFn(&opts)
-	}
-
-	opts.Writer = &syncWriter{writer: opts.Writer}
-
-	props := &loggerProps{
-		attrs:  nil,
-		prefix: "",
-		pool:   NewPool(&opts),
-
-		Options: opts,
-	}
-
-	switch opts.Format {
-	case logFormatConsole:
-		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
-	case logFormatLogFmt:
-		return &Logger{loggerAPI: &logfmtLogger{kv: nil, loggerProps: props}}
-	case logFormatJSON:
-		return &Logger{loggerAPI: &jsonLogger{kv: nil, loggerProps: props}}
-	default:
-		return &Logger{loggerAPI: &consoleLogger{kv: nil, loggerProps: props}}
-	}
+func (l *loggerBuilder) LogLevel(level slog.Level) *loggerBuilder {
+	l.options.LogLevel = level
+	return l
 }
 
-type loggerAPI interface {
+// DebugMode is an alias to LogLevel(slog.LevelDebug) 
+func (l *loggerBuilder) DebugMode(enable bool) *loggerBuilder {
+	l.options.LogLevel = slog.LevelDebug
+	return l
+}
+
+func (l *loggerBuilder) SkipCallerFrames(n int) *loggerBuilder {
+	l.options.SkipCallerFrames = n
+	return l
+}
+
+func (l *loggerBuilder) Verbosity(n int) *loggerBuilder {
+	l.options.VerbosityLevel = n
+	return l
+}
+
+type loggerBuilder struct {
+	prefix string
+	options *Options
+}
+
+type Logger interface {
 	Info(msg string, kv ...any)
 	Debug(msg string, kv ...any)
 	Warn(msg string, kv ...any)
 	Error(msg string, kv ...any)
 
-	With(kv ...any) *Logger
+	// Verbosity() returns the verbosity level of the logger
+	// Verbosity() int
+
+	With(kv ...any) Logger
 	Slog() *slog.Logger
 
-	Clone(option ...OptionFn) *Logger
+	Clone() *loggerBuilder
 }
 
-type Logger struct {
-	loggerAPI
+func JSON() Logger {
+	return New().JSON()
 }
+
+func Logfmt() Logger {
+	return New().Logfmt()
+}
+
+func Console() Logger {
+	return New().Console()
+}
+
