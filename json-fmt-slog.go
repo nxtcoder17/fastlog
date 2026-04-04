@@ -6,7 +6,10 @@ import (
 )
 
 type jsonLoggerSlog struct {
-	*loggerProps
+	kv []slog.Attr
+	prefix string
+	opts *Options
+	pool *Pool
 }
 
 func (j *jsonLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
@@ -47,14 +50,14 @@ func (j *jsonLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
 
 // Enabled implements slog.Handler.
 func (j *jsonLoggerSlog) Enabled(_ context.Context, lvl slog.Level) bool {
-	return lvl >= j.LogLevel
+	return lvl >= j.opts.LogLevel
 }
 
 // Handle implements slog.Handler.
 func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 	buf := j.pool.Get()
 	buf.Append("{")
-	buf.AppendCaller(3 + j.SkipCallerFrames)
+	buf.AppendCaller(3 + j.opts.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(record.Level)
@@ -63,7 +66,7 @@ func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 	buf.AppendMsg(record.Message)
 
 	c := 0
-	record.AddAttrs(j.attrs...)
+	record.AddAttrs(j.kv...)
 	record.Attrs(func(a slog.Attr) bool {
 		if c <= record.NumAttrs() {
 			buf.AppendComponentSeparator()
@@ -75,31 +78,33 @@ func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 
 	buf.Append('}')
 	buf.Append('\n')
-	_, err := j.Writer.Write(buf.Bytes())
+	_, err := j.opts.Writer.Write(buf.Bytes())
 	j.pool.Put(buf)
 	return err
 }
 
 // WithAttrs implements slog.Handler.
 func (j *jsonLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
+	kv := make([]slog.Attr, 0, len(j.kv) + len(attrs))
+	kv = append(kv, j.kv...)
+	kv = append(kv, attrs...)
+
+
 	return &jsonLoggerSlog{
-		loggerProps: &loggerProps{
-			pool:    j.pool,
-			attrs:   append(j.attrs, attrs...),
-			Options: j.Options,
-		},
+		kv: kv,
+		prefix: j.prefix,
+		pool:    j.pool,
+		opts: j.opts,
 	}
 }
 
 // WithGroup implements slog.Handler.
 func (j *jsonLoggerSlog) WithGroup(name string) slog.Handler {
 	return &jsonLoggerSlog{
-		loggerProps: &loggerProps{
-			pool:    j.pool,
-			attrs:   j.attrs,
-			prefix:  name + "." + j.prefix,
-			Options: j.Options,
-		},
+		kv:   j.kv,
+		prefix:  name + "." + j.prefix,
+		pool:    j.pool,
+		opts: j.opts,
 	}
 }
 

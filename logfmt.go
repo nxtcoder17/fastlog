@@ -6,7 +6,9 @@ import (
 
 type logfmtLogger struct {
 	kv []any
-	*loggerProps
+	prefix string
+	opts *Options
+	pool *Pool
 }
 
 // Debug implements LoggerAPI.
@@ -30,51 +32,49 @@ func (l *logfmtLogger) Warn(msg string, kv ...any) {
 }
 
 // With implements loggerAPI.
-func (l *logfmtLogger) With(kv ...any) *Logger {
-	return &Logger{
-		loggerAPI: &logfmtLogger{
-			kv: kv,
-			loggerProps: &loggerProps{
-				attrs:   l.loggerProps.attrs,
-				prefix:  l.loggerProps.prefix,
-				pool:    l.loggerProps.pool,
-				Options: l.loggerProps.Options,
-			},
-		},
+func (l *logfmtLogger) With(kv ...any) Logger {
+	attrs := make([]any, 0, len(kv) + len(l.kv))
+	attrs = append(attrs, l.kv...)
+	attrs = append(attrs, kv...)
+
+	return &logfmtLogger{
+		kv: attrs,
+		pool:    l.pool,
+		opts: l.opts,
 	}
 }
 
 func (l *logfmtLogger) Slog() *slog.Logger {
-	return slog.New(&logfmtSlog{l.loggerProps})
+	kv := make([]slog.Attr, 0, len(l.kv))
+	for i := 1; i < len(l.kv); i++ {
+		kv = append(kv, slog.Any(l.kv[i-1].(string), l.kv[i]))
+	}
+
+	return slog.New(&logfmtSlog{
+		kv:   kv,
+		pool:  l.pool,
+		opts: l.opts,
+	})
 }
 
 // Clone implements loggerAPI.
-func (c *logfmtLogger) Clone(options ...OptionFn) *Logger {
-	opts := c.loggerProps.Options.clone(options...)
-
-	return &Logger{
-		loggerAPI: &logfmtLogger{
-			kv: c.kv,
-			loggerProps: &loggerProps{
-				attrs:   c.loggerProps.attrs,
-				prefix:  c.loggerProps.prefix,
-				pool:    NewPool(&opts),
-				Options: opts,
-			},
-		},
+func (l *logfmtLogger) Clone() *loggerBuilder {
+	return &loggerBuilder{
+		options: l.opts,
+		prefix: l.prefix,
 	}
 }
 
-var _ loggerAPI = (*logfmtLogger)(nil)
+var _ Logger = (*logfmtLogger)(nil)
 
 func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error {
-	if level < l.LogLevel {
+	if level < l.opts.LogLevel {
 		return nil
 	}
 
 	buf := l.pool.Get()
 
-	buf.AppendCaller(2 + l.SkipCallerFrames)
+	buf.AppendCaller(2 + l.opts.SkipCallerFrames)
 	buf.AppendComponentSeparator()
 
 	buf.AppendLogLevel(level)
@@ -94,7 +94,7 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 	}
 
 	buf.Append('\n')
-	if _, err := l.Writer.Write(buf.Bytes()); err != nil {
+	if _, err := l.opts.Writer.Write(buf.Bytes()); err != nil {
 		return err
 	}
 

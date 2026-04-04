@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"github.com/nxtcoder17/fastlog/types"
 )
 
 type Pool struct {
@@ -14,11 +15,19 @@ type Pool struct {
 	sync.Pool
 }
 
-func NewPool(opts *Options) *Pool {
+type bufferPoolOptions struct {
+	WithTimestamp bool
+	WithColors bool
+	WithCaller bool
+
+	LogFormat types.LogFormat
+}
+
+func newPool(opts *bufferPoolOptions) *Pool {
 	newBuffer := func() *Buffer {
 		return &Buffer{
 			store:   make([]byte, 0, InitialBufSize),
-			Options: opts,
+			opts: opts,
 		}
 	}
 	return &Pool{
@@ -49,7 +58,7 @@ func (p *Pool) Put(buf *Buffer) {
 
 type Buffer struct {
 	store []byte
-	*Options
+	opts *bufferPoolOptions
 }
 
 func (buf *Buffer) Appendf(s string, args ...any) {
@@ -57,8 +66,8 @@ func (buf *Buffer) Appendf(s string, args ...any) {
 }
 
 func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
-	switch buf.Format {
-	case logFormatConsole:
+	switch buf.opts.LogFormat {
+	case types.LogFormatConsole:
 	default:
 		buf.AppendAttrKey(LevelFieldKey)
 		buf.AppendAttrSeparator()
@@ -66,30 +75,30 @@ func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
 
 	switch lvl {
 	case slog.LevelDebug:
-		if !buf.EnableColors {
+		if !buf.opts.WithColors {
 			buf.store = append(buf.store, FgWhite...)
 		}
 		buf.AppendAttrValue("DEBUG")
 
 	case slog.LevelInfo:
-		if buf.EnableColors {
+		if buf.opts.WithColors {
 			buf.store = append(buf.store, FgGreen...)
 		}
 		buf.AppendAttrValue("INFO")
 
 	case slog.LevelWarn:
-		if buf.EnableColors {
+		if buf.opts.WithColors {
 			buf.store = append(buf.store, FgYellow...)
 		}
 		buf.AppendAttrValue("WARN")
 	case slog.LevelError:
-		if buf.EnableColors {
+		if buf.opts.WithColors {
 			buf.store = append(buf.store, FgRed...)
 		}
 		buf.AppendAttrValue("ERROR")
 	}
 
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
 
@@ -97,23 +106,23 @@ func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
 }
 
 func (buf *Buffer) AppendAttrSeparator() {
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorSeparator...)
 	}
-	switch buf.Format {
-	case logFormatJSON:
+	switch buf.opts.LogFormat {
+	case types.LogFormatJSON:
 		buf.store = append(buf.store, ':')
 	default:
 		buf.store = append(buf.store, '=')
 	}
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
 }
 
 func (buf *Buffer) AppendComponentSeparator() {
-	switch buf.Format {
-	case logFormatJSON:
+	switch buf.opts.LogFormat {
+	case types.LogFormatJSON:
 		buf.store = append(buf.store, ',')
 	default:
 		buf.store = append(buf.store, ' ')
@@ -121,53 +130,53 @@ func (buf *Buffer) AppendComponentSeparator() {
 }
 
 func (buf *Buffer) AppendMsg(msg string) {
-	switch buf.Format {
-	case logFormatJSON, logFormatLogFmt:
+	switch buf.opts.LogFormat {
+	case types.LogFormatJSON, types.LogFormatLogfmt:
 		buf.AppendAttrKey(MessageFieldKey)
 		buf.AppendAttrSeparator()
 	}
 
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorMessage...)
 	}
 	buf.AppendAttrValue(msg)
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
 }
 
 func (buf *Buffer) AppendAttrKey(key any) {
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorKey...)
 	}
 
-	switch buf.Format {
-	case logFormatJSON:
+	switch buf.opts.LogFormat {
+	case types.LogFormatJSON:
 		buf.AppendWithQuote(key)
 	default:
 		buf.Append(key)
 	}
 
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
 }
 
 func (buf *Buffer) AppendAttrKeyColor() {
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorKey...)
 	}
 }
 
 func (buf *Buffer) AppendAttrKeyColorReset() {
-	if buf.EnableColors {
+	if buf.opts.WithColors {
 		buf.store = append(buf.store, ColorReset...)
 	}
 }
 
 func (buf *Buffer) AppendAttrValue(value any) {
-	switch buf.Format {
-	case logFormatJSON:
+	switch buf.opts.LogFormat {
+	case types.LogFormatJSON:
 		buf.AppendWithQuote(value)
 	default:
 		buf.Append(value)
@@ -175,11 +184,11 @@ func (buf *Buffer) AppendAttrValue(value any) {
 }
 
 func (buf *Buffer) AppendCaller(skip int) bool {
-	if buf.ShowCaller {
+	if buf.opts.WithCaller {
 		_, file, line, ok := runtime.Caller(skip + 1)
 		if ok {
-			switch buf.Format {
-			case logFormatConsole:
+			switch buf.opts.LogFormat {
+			case types.LogFormatConsole:
 			default:
 				buf.AppendAttrKey(CallerFieldKey)
 				buf.AppendAttrSeparator()
@@ -187,13 +196,13 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 				defer buf.Append('"')
 			}
 
-			if buf.EnableColors {
+			if buf.opts.WithColors {
 				buf.Append(FgBrightBlack)
 			}
 
 			trimCallerPath(buf, file, 2)
 			buf.Append(':')
-			if buf.Format == logFormatConsole {
+			if buf.opts.LogFormat == types.LogFormatConsole {
 				buf.Appendf("%-3d", line)
 			} else {
 				buf.Append(line)
@@ -205,9 +214,9 @@ func (buf *Buffer) AppendCaller(skip int) bool {
 }
 
 func (buf *Buffer) AppendTimestamp() bool {
-	if buf.ShowTimestamp {
-		switch buf.Format {
-		case logFormatConsole:
+	if buf.opts.WithTimestamp {
+		switch buf.opts.LogFormat {
+		case types.LogFormatConsole:
 		default:
 			buf.AppendAttrKey(TimestampFieldKey)
 			buf.AppendAttrSeparator()
@@ -215,7 +224,7 @@ func (buf *Buffer) AppendTimestamp() bool {
 			defer buf.Append('"')
 		}
 
-		if buf.EnableColors {
+		if buf.opts.WithColors {
 			buf.Append(FgBrightBlack)
 		}
 

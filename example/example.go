@@ -14,7 +14,8 @@ type user struct {
 }
 
 func main() {
-	debug := flag.Bool("debug", false, "--debug")
+	var debug bool
+	flag.BoolVar(&debug, "debug", false, "--debug")
 	flag.Parse()
 
 	attrs := []any{
@@ -46,14 +47,14 @@ func main() {
 		},
 	}
 
-	logfmt := fastlog.New(fastlog.Logfmt(), fastlog.ShowDebugLogs(*debug))
+	logfmt := fastlog.New().DebugMode(debug).Logfmt()
 	fmt.Printf("# LOGFMT:\n\n")
 	logfmt.Debug("hello", attrs...)
 	logfmt.Info("hello", attrs...)
 	logfmt.Warn("hello", attrs...)
 	logfmt.Error("hello", attrs...)
 
-	logfmt.Clone().Info("hello [from clone]", attrs...)
+	logfmt.Clone().Logfmt().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# LOGFMT (slog):\n\n")
 	logfmtSlog := logfmt.Slog()
@@ -62,7 +63,7 @@ func main() {
 	logfmtSlog.Warn("hello", attrs...)
 	logfmtSlog.Error("hello", attrs...)
 
-	consolefmt := fastlog.New(fastlog.Console(), fastlog.ShowDebugLogs(*debug))
+	consolefmt := fastlog.New().DebugMode(debug).Console()
 
 	fmt.Printf("\n# CONSOLE:\n\n")
 	consolefmt.Debug("hello", attrs...)
@@ -70,7 +71,7 @@ func main() {
 	consolefmt.Warn("hello", attrs...)
 	consolefmt.Error("hello", attrs...)
 
-	consolefmt.Clone().Info("hello [from clone]", attrs...)
+	consolefmt.Clone().Console().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# CONSOLE (slog):\n\n")
 	consoleFmtSlog := consolefmt.Slog()
@@ -79,14 +80,14 @@ func main() {
 	consoleFmtSlog.Warn("hello", attrs...)
 	consoleFmtSlog.Error("hello", attrs...)
 
-	jsonfmt := fastlog.New(fastlog.Json(), fastlog.ShowDebugLogs(*debug))
+	jsonfmt := fastlog.New().DebugMode(debug).JSON()
 
 	fmt.Printf("\n# JSON:\n\n")
 	jsonfmt.Debug("hello", attrs...)
 	jsonfmt.Info("hello", attrs...)
 	jsonfmt.Warn("hello", attrs...)
 	jsonfmt.Error("hello", attrs...)
-	jsonfmt.Clone().Info("hello [from clone]", attrs...)
+	jsonfmt.Clone().JSON().Info("hello [from clone]", attrs...)
 
 	fmt.Printf("\n# JSON (slog):\n\n")
 	jsonFmtSlog := jsonfmt.Slog()

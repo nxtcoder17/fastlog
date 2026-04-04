@@ -6,12 +6,15 @@ import (
 )
 
 type consoleLoggerSlog struct {
-	*loggerProps
+	kv  []slog.Attr
+	prefix string
+	pool   *Pool
+	opts *Options
 }
 
 func (l *consoleLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
 	buf.AppendAttrKeyColor()
-	if l.prefix != "" {
+if l.prefix != "" {
 		buf.Append(l.prefix)
 		buf.Append(".")
 	}
@@ -50,7 +53,7 @@ func (l *consoleLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
 
 // Enabled implements slog.Handler.
 func (l *consoleLoggerSlog) Enabled(ctx context.Context, lvl slog.Level) bool {
-	return lvl >= l.LogLevel
+	return lvl >= l.opts.LogLevel
 }
 
 // Handle implements slog.Handler.
@@ -62,7 +65,7 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 		buf.AppendComponentSeparator()
 	}
 
-	if buf.AppendCaller(3 + l.SkipCallerFrames) {
+	if buf.AppendCaller(3 + l.opts.SkipCallerFrames) {
 		buf.AppendComponentSeparator()
 		buf.Append('|')
 		buf.AppendComponentSeparator()
@@ -80,7 +83,7 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 	}
 
 	c := 0
-	record.AddAttrs(l.attrs...)
+	record.AddAttrs(l.kv...)
 	record.Attrs(func(a slog.Attr) bool {
 		if c <= record.NumAttrs() {
 			buf.AppendComponentSeparator()
@@ -91,32 +94,32 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 	})
 
 	buf.Append('\n')
-	_, err := l.Writer.Write(buf.Bytes())
+	_, err := l.opts.Writer.Write(buf.Bytes())
 	l.pool.Put(buf)
 	return err
 }
 
 // WithAttrs implements slog.Handler.
 func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &consoleLoggerSlog{
-		loggerProps: &loggerProps{
-			pool:    l.pool,
-			attrs:   append(l.attrs, attrs...),
-			Options: l.Options,
-		},
+	kv := make([]slog.Attr, 0, len(l.kv) + len(attrs))
+	kv = append(kv, l.kv...)
+	kv = append(kv, attrs...)
+
+	return  &consoleLoggerSlog{
+		pool:   l.pool,
+		prefix: l.prefix,
+		kv:     kv,
+		opts:   l.opts,
 	}
 }
 
 // WithGroup implements slog.Handler.
 func (l *consoleLoggerSlog) WithGroup(name string) slog.Handler {
 	return &consoleLoggerSlog{
-		loggerProps: &loggerProps{
-			pool:   l.pool,
-			attrs:  l.attrs,
-			prefix: name + "." + l.prefix,
-
-			Options: l.Options,
-		},
+		pool:   l.pool,
+		prefix: name + "." + l.prefix,
+		kv:  l.kv,
+		opts: l.opts,
 	}
 }
 
