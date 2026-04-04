@@ -93,29 +93,29 @@ timestamp=2024-01-15T10:30:45Z level=INFO message=hello world user=john age=30
 goos: linux
 goarch: amd64
 pkg: github.com/nxtcoder17/fastlog/benchmark
-cpu: AMD Ryzen 9 6900HS with Radeon Graphics
-BenchmarkFastlog_console_withoutCaller-16         	  713667	      1688 ns/op	     272 B/op	      16 allocs/op
-BenchmarkFastlog_console_withCaller-16            	  481687	      2348 ns/op	     520 B/op	      18 allocs/op
-BenchmarkFastlog_console_slog_withoutCaller-16    	  437119	      2819 ns/op	     600 B/op	      28 allocs/op
-BenchmarkFastlog_console_slog_withCaller-16       	  291745	      4001 ns/op	     849 B/op	      30 allocs/op
-BenchmarkFastlog_logfmt_withoutCaller-16          	  767406	      1596 ns/op	     256 B/op	      16 allocs/op
-BenchmarkFastlog_logfmt_withCaller-16             	  500019	      2224 ns/op	     520 B/op	      19 allocs/op
-BenchmarkFastlog_logfmt_slog_withoutCaller-16     	  421028	      2768 ns/op	     584 B/op	      28 allocs/op
-BenchmarkFastlog_logfmt_slog_withCaller-16        	  302834	      3956 ns/op	     849 B/op	      31 allocs/op
-BenchmarkFastlog_json_withoutCaller-16            	  626450	      1815 ns/op	     256 B/op	      16 allocs/op
-BenchmarkFastlog_json_withCaller-16               	  499382	      2398 ns/op	     520 B/op	      19 allocs/op
-BenchmarkFastlog_json_slog_withoutCaller-16       	  446340	      2621 ns/op	     584 B/op	      28 allocs/op
-BenchmarkFastlog_json_slog_withCaller-16          	  295039	      3726 ns/op	     849 B/op	      31 allocs/op
-BenchmarkPhusluLog_withoutCaller-16               	  363284	      3259 ns/op	     945 B/op	      28 allocs/op
-BenchmarkPhusluLog_withCaller-16                  	  342709	      3437 ns/op	     945 B/op	      28 allocs/op
-BenchmarkPhusluLog_slog_withoutCaller-16          	  304657	      3838 ns/op	    1106 B/op	      29 allocs/op
-BenchmarkPhusluLog_slog_withCaller-16             	  283930	      4176 ns/op	    1106 B/op	      29 allocs/op
-BenchmarkSlog_JSON-16                             	  247533	      4817 ns/op	    1738 B/op	      40 allocs/op
-BenchmarkSlog_Info_With_Caller-16                 	  207474	      5579 ns/op	    2323 B/op	      46 allocs/op
-BenchmarkSlog_Text-16                             	  158947	      6557 ns/op	    1442 B/op	      34 allocs/op
-BenchmarkSlog_Text_With_Caller-16                 	  169699	      7488 ns/op	    1834 B/op	      39 allocs/op
-BenchmarkZap_SugarInfo-16                         	  235269	      4915 ns/op	    2593 B/op	      32 allocs/op
-BenchmarkZerolog_Info-16                          	  291512	      3953 ns/op	    2018 B/op	      46 allocs/op
+cpu: AMD Ryzen 9 6900HS with Radeon Graphics        
+BenchmarkFastlog_console_withoutCaller-16         	  750530	      1687 ns/op	     272 B/op	      16 allocs/op
+BenchmarkFastlog_console_withCaller-16            	  510012	      2367 ns/op	     520 B/op	      18 allocs/op
+BenchmarkFastlog_console_slog_withoutCaller-16    	  395643	      2850 ns/op	     600 B/op	      28 allocs/op
+BenchmarkFastlog_console_slog_withCaller-16       	  292074	      3850 ns/op	     849 B/op	      30 allocs/op
+BenchmarkFastlog_logfmt_withoutCaller-16          	  754854	      1554 ns/op	     256 B/op	      16 allocs/op
+BenchmarkFastlog_logfmt_withCaller-16             	  507148	      2136 ns/op	     520 B/op	      19 allocs/op
+BenchmarkFastlog_logfmt_slog_withoutCaller-16     	  442084	      2703 ns/op	     584 B/op	      28 allocs/op
+BenchmarkFastlog_logfmt_slog_withCaller-16        	  294006	      3856 ns/op	     849 B/op	      31 allocs/op
+BenchmarkFastlog_json_withoutCaller-16            	  631666	      1785 ns/op	     256 B/op	      16 allocs/op
+BenchmarkFastlog_json_withCaller-16               	  511449	      2361 ns/op	     520 B/op	      19 allocs/op
+BenchmarkFastlog_json_slog_withoutCaller-16       	  492972	      2537 ns/op	     584 B/op	      28 allocs/op
+BenchmarkFastlog_json_slog_withCaller-16          	  339217	      3643 ns/op	     849 B/op	      31 allocs/op
+BenchmarkPhusluLog_withoutCaller-16               	  355879	      3118 ns/op	     945 B/op	      28 allocs/op
+BenchmarkPhusluLog_withCaller-16                  	  344761	      3493 ns/op	     945 B/op	      28 allocs/op
+BenchmarkPhusluLog_slog_withoutCaller-16          	  309410	      3848 ns/op	    1106 B/op	      29 allocs/op
+BenchmarkPhusluLog_slog_withCaller-16             	  295239	      3976 ns/op	    1106 B/op	      29 allocs/op
+BenchmarkSlog_JSON-16                             	  249128	      4721 ns/op	    1738 B/op	      40 allocs/op
+BenchmarkSlog_Info_With_Caller-16                 	  194593	      5881 ns/op	    2323 B/op	      46 allocs/op
+BenchmarkSlog_Text-16                             	  165500	      6754 ns/op	    1442 B/op	      34 allocs/op
+BenchmarkSlog_Text_With_Caller-16                 	  158253	      7313 ns/op	    1850 B/op	      39 allocs/op
+BenchmarkZap_SugarInfo-16                         	  234570	      4962 ns/op	    2593 B/op	      32 allocs/op
+BenchmarkZerolog_Info-16                          	  287758	      3950 ns/op	    2018 B/op	      46 allocs/op
 ```
 
 ## Performance Comparison (logfmt without caller)

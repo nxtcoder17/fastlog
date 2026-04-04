@@ -5,10 +5,23 @@ tasks:
     cmd:
       - go test -bench=. -benchmem
 
+
+  benchmark:picker:
+    dir: ./benchmark
+    interactive: true
+    env:
+      benchmark:
+        sh: |+
+          delim=":><:"
+          rg '^func (Benchmark(\w+))' -o -r '$1 :><: $2' --no-filename | fzf -d $delim --with-nth 2  --prompt "Run Benchmark >" | awk -F"$delim" '{print $1}'
+    cmd:
+      - go test -bench=^$benchmark -benchmem
+
   profile:mem:
     dir: ./benchmark
     cmd:
-      - go test -bench=^BenchmarkFast -benchmem -memprofile ./mem.prof
+      # - go test -bench=^BenchmarkFast -benchmem -memprofile ./mem.prof
+      - go test -bench=^BenchmarkFast_console_withoutCaller -benchmem -memprofile ./mem.prof
 
   profile:serve:
     dir: ./benchmark

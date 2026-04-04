@@ -1,4 +1,6 @@
 .direnv
 tags
-.prof
-.test
+*.prof
+*.out
+*.test
+bin/
