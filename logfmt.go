@@ -46,7 +46,7 @@ func (l *logfmtLogger) With(kv ...any) Logger {
 
 func (l *logfmtLogger) Slog() *slog.Logger {
 	kv := make([]slog.Attr, 0, len(l.kv))
-	for i := 1; i < len(l.kv); i++ {
+	for i := 1; i < len(l.kv); i+=2 {
 		kv = append(kv, slog.Any(l.kv[i-1].(string), l.kv[i]))
 	}
 

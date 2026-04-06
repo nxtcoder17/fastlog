@@ -48,7 +48,7 @@ func (c *consoleLogger) With(kv ...any) Logger {
 // Slog implements loggerAPI.
 func (c *consoleLogger) Slog() *slog.Logger {
 	kv := make([]slog.Attr, 0, len(c.kv))
-	for i := 1; i < len(c.kv); i++ {
+	for i := 1; i < len(c.kv); i+=2 {
 		kv = append(kv, slog.Any(c.kv[i-1].(string), c.kv[i]))
 	}
 

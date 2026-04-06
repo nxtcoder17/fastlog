@@ -48,7 +48,7 @@ func (j *jsonLogger) With(kv ...any) Logger {
 // Slog implements loggerAPI.
 func (j *jsonLogger) Slog() *slog.Logger {
 	kv := make([]slog.Attr, 0, len(j.kv))
-	for i := 1; i < len(j.kv); i++ {
+	for i := 1; i < len(j.kv); i+=2 {
 		kv = append(kv, slog.Any(j.kv[i-1].(string), j.kv[i]))
 	}
 
