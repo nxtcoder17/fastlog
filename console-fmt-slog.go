@@ -6,15 +6,15 @@ import (
 )
 
 type consoleLoggerSlog struct {
-	kv  []slog.Attr
+	kv     []slog.Attr
 	prefix string
 	pool   *Pool
-	opts *Options
+	opts   *Options
 }
 
 func (l *consoleLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
 	buf.AppendAttrKeyColor()
-if l.prefix != "" {
+	if l.prefix != "" {
 		buf.Append(l.prefix)
 		buf.Append(".")
 	}
@@ -61,7 +61,8 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 	buf := l.pool.Get()
 
 	if buf.AppendTimestamp() {
-		buf.Appendf(" | ")
+		buf.AppendComponentSeparator()
+		buf.Append('|')
 		buf.AppendComponentSeparator()
 	}
 
@@ -82,13 +83,9 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 		buf.Append('\t')
 	}
 
-	c := 0
 	record.AddAttrs(l.kv...)
 	record.Attrs(func(a slog.Attr) bool {
-		if c <= record.NumAttrs() {
-			buf.AppendComponentSeparator()
-		}
-		c += 1
+		buf.AppendComponentSeparator()
 		l.parseAttr(buf, a)
 		return true
 	})
@@ -101,11 +98,11 @@ func (l *consoleLoggerSlog) Handle(ctx context.Context, record slog.Record) erro
 
 // WithAttrs implements slog.Handler.
 func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
-	kv := make([]slog.Attr, 0, len(l.kv) + len(attrs))
+	kv := make([]slog.Attr, 0, len(l.kv)+len(attrs))
 	kv = append(kv, l.kv...)
 	kv = append(kv, attrs...)
 
-	return  &consoleLoggerSlog{
+	return &consoleLoggerSlog{
 		pool:   l.pool,
 		prefix: l.prefix,
 		kv:     kv,
@@ -115,11 +112,15 @@ func (l *consoleLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
 
 // WithGroup implements slog.Handler.
 func (l *consoleLoggerSlog) WithGroup(name string) slog.Handler {
+	newPrefix := name
+	if l.prefix != "" {
+		newPrefix = l.prefix + "." + name
+	}
 	return &consoleLoggerSlog{
 		pool:   l.pool,
-		prefix: name + "." + l.prefix,
-		kv:  l.kv,
-		opts: l.opts,
+		prefix: newPrefix,
+		kv:     l.kv,
+		opts:   l.opts,
 	}
 }
 
