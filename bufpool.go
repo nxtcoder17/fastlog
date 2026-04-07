@@ -2,12 +2,12 @@ package fastlog
 
 import (
 	"fmt"
+	"github.com/nxtcoder17/fastlog/types"
 	"log/slog"
 	"runtime"
 	"strconv"
 	"sync"
 	"time"
-	"github.com/nxtcoder17/fastlog/types"
 )
 
 type Pool struct {
@@ -17,8 +17,8 @@ type Pool struct {
 
 type bufferPoolOptions struct {
 	WithTimestamp bool
-	WithColors bool
-	WithCaller bool
+	WithColors    bool
+	WithCaller    bool
 
 	LogFormat types.LogFormat
 }
@@ -26,8 +26,8 @@ type bufferPoolOptions struct {
 func newPool(opts *bufferPoolOptions) *Pool {
 	newBuffer := func() *Buffer {
 		return &Buffer{
-			store:   make([]byte, 0, InitialBufSize),
-			opts: opts,
+			store: make([]byte, 0, InitialBufSize),
+			opts:  opts,
 		}
 	}
 	return &Pool{
@@ -58,7 +58,7 @@ func (p *Pool) Put(buf *Buffer) {
 
 type Buffer struct {
 	store []byte
-	opts *bufferPoolOptions
+	opts  *bufferPoolOptions
 }
 
 func (buf *Buffer) Appendf(s string, args ...any) {
@@ -75,7 +75,7 @@ func (buf *Buffer) AppendLogLevel(lvl slog.Level) bool {
 
 	switch lvl {
 	case slog.LevelDebug:
-		if !buf.opts.WithColors {
+		if buf.opts.WithColors {
 			buf.store = append(buf.store, FgWhite...)
 		}
 		buf.AppendAttrValue("DEBUG")

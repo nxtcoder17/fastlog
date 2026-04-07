@@ -6,10 +6,10 @@ import (
 )
 
 type jsonLoggerSlog struct {
-	kv []slog.Attr
+	kv     []slog.Attr
 	prefix string
-	opts *Options
-	pool *Pool
+	opts   *Options
+	pool   *Pool
 }
 
 func (j *jsonLoggerSlog) parseAttr(buf *Buffer, attr slog.Attr) {
@@ -57,21 +57,19 @@ func (j *jsonLoggerSlog) Enabled(_ context.Context, lvl slog.Level) bool {
 func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 	buf := j.pool.Get()
 	buf.Append("{")
-	buf.AppendCaller(3 + j.opts.SkipCallerFrames)
-	buf.AppendComponentSeparator()
+
+	if buf.AppendCaller(3 + j.opts.SkipCallerFrames) {
+		buf.AppendComponentSeparator()
+	}
 
 	buf.AppendLogLevel(record.Level)
 	buf.AppendComponentSeparator()
 
 	buf.AppendMsg(record.Message)
 
-	c := 0
 	record.AddAttrs(j.kv...)
 	record.Attrs(func(a slog.Attr) bool {
-		if c <= record.NumAttrs() {
-			buf.AppendComponentSeparator()
-		}
-		c += 1
+		buf.AppendComponentSeparator()
 		j.parseAttr(buf, a)
 		return true
 	})
@@ -85,26 +83,29 @@ func (j *jsonLoggerSlog) Handle(_ context.Context, record slog.Record) error {
 
 // WithAttrs implements slog.Handler.
 func (j *jsonLoggerSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
-	kv := make([]slog.Attr, 0, len(j.kv) + len(attrs))
+	kv := make([]slog.Attr, 0, len(j.kv)+len(attrs))
 	kv = append(kv, j.kv...)
 	kv = append(kv, attrs...)
 
-
 	return &jsonLoggerSlog{
-		kv: kv,
+		kv:     kv,
 		prefix: j.prefix,
-		pool:    j.pool,
-		opts: j.opts,
+		pool:   j.pool,
+		opts:   j.opts,
 	}
 }
 
 // WithGroup implements slog.Handler.
 func (j *jsonLoggerSlog) WithGroup(name string) slog.Handler {
+	newPrefix := name
+	if j.prefix != "" {
+		newPrefix = j.prefix + "." + name
+	}
 	return &jsonLoggerSlog{
-		kv:   j.kv,
-		prefix:  name + "." + j.prefix,
-		pool:    j.pool,
-		opts: j.opts,
+		kv:     j.kv,
+		prefix: newPrefix,
+		pool:   j.pool,
+		opts:   j.opts,
 	}
 }
 

@@ -5,10 +5,10 @@ import (
 )
 
 type consoleLogger struct {
-	kv []any
+	kv     []any
 	prefix string
-	opts *Options
-	pool *Pool
+	opts   *Options
+	pool   *Pool
 }
 
 // Debug implements loggerAPI.
@@ -33,38 +33,40 @@ func (c *consoleLogger) Warn(msg string, kv ...any) {
 
 // With implements loggerAPI.
 func (c *consoleLogger) With(kv ...any) Logger {
-	newKVs := make([]any, 0, len(kv) + len(c.kv))
+	newKVs := make([]any, 0, len(kv)+len(c.kv))
 	newKVs = append(newKVs, c.kv...)
 	newKVs = append(newKVs, kv...)
 
 	return &consoleLogger{
-		kv: newKVs,
+		kv:     newKVs,
 		prefix: c.prefix,
-		opts: c.opts,
-		pool: c.pool,
+		opts:   c.opts,
+		pool:   c.pool,
 	}
 }
 
 // Slog implements loggerAPI.
 func (c *consoleLogger) Slog() *slog.Logger {
 	kv := make([]slog.Attr, 0, len(c.kv))
-	for i := 1; i < len(c.kv); i+=2 {
+	for i := 1; i < len(c.kv); i += 2 {
 		kv = append(kv, slog.Any(c.kv[i-1].(string), c.kv[i]))
 	}
 
 	return slog.New(&consoleLoggerSlog{
-		kv: kv,
+		kv:     kv,
 		prefix: c.prefix,
-		pool: c.pool,
-		opts: c.opts,
+		pool:   c.pool,
+		opts:   c.opts,
 	})
 }
 
 // Clone implements loggerAPI.
 func (c *consoleLogger) Clone() *loggerBuilder {
+	optsCopy := *c.opts
 	return &loggerBuilder{
-		prefix: c.prefix,
-		options: c.opts,
+		prefix:  c.prefix,
+		options: &optsCopy,
+		kv:      c.kv,
 	}
 }
 

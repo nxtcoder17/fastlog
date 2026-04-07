@@ -6,10 +6,10 @@ import (
 )
 
 type logfmtSlog struct {
-	kv  []slog.Attr
+	kv     []slog.Attr
 	pool   *Pool
 	prefix string
-	opts *Options
+	opts   *Options
 }
 
 var _ slog.Handler = (*logfmtSlog)(nil)
@@ -61,8 +61,12 @@ func (l *logfmtSlog) Enabled(ctx context.Context, lvl slog.Level) bool {
 func (l *logfmtSlog) Handle(ctx context.Context, record slog.Record) error {
 	buf := l.pool.Get()
 
-	buf.AppendCaller(3 + l.opts.SkipCallerFrames)
-	buf.AppendComponentSeparator()
+	if buf.AppendTimestamp() {
+		buf.AppendComponentSeparator()
+	}
+	if buf.AppendCaller(3 + l.opts.SkipCallerFrames) {
+		buf.AppendComponentSeparator()
+	}
 
 	buf.AppendLogLevel(record.Level)
 	buf.AppendComponentSeparator()
@@ -70,13 +74,9 @@ func (l *logfmtSlog) Handle(ctx context.Context, record slog.Record) error {
 	buf.AppendMsg(record.Message)
 	buf.AppendComponentSeparator()
 
-	c := 0
 	record.AddAttrs(l.kv...)
 	record.Attrs(func(a slog.Attr) bool {
-		if c <= record.NumAttrs() {
-			buf.AppendComponentSeparator()
-		}
-		c += 1
+		buf.AppendComponentSeparator()
 		l.parseAttr(buf, a)
 		return true
 	})
@@ -90,24 +90,28 @@ func (l *logfmtSlog) Handle(ctx context.Context, record slog.Record) error {
 
 // WithAttrs implements slog.Handler.
 func (l *logfmtSlog) WithAttrs(attrs []slog.Attr) slog.Handler {
-	kv := make([]slog.Attr, 0, len(l.kv)+ len(attrs))
+	kv := make([]slog.Attr, 0, len(l.kv)+len(attrs))
 	kv = append(kv, l.kv...)
 	kv = append(kv, attrs...)
 
 	return &logfmtSlog{
-		kv:    kv,
+		kv:     kv,
 		prefix: l.prefix,
-		pool: l.pool,
-		opts: l.opts,
+		pool:   l.pool,
+		opts:   l.opts,
 	}
 }
 
 // WithGroup implements slog.Handler.
 func (l *logfmtSlog) WithGroup(name string) slog.Handler {
+	newPrefix := name
+	if l.prefix != "" {
+		newPrefix = l.prefix + "." + name
+	}
 	return &logfmtSlog{
-		kv:  l.kv,
-		prefix: name + "." + l.prefix,
+		kv:     l.kv,
+		prefix: newPrefix,
 		pool:   l.pool,
-		opts: l.opts,
+		opts:   l.opts,
 	}
 }

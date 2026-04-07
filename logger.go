@@ -1,11 +1,11 @@
 package fastlog
 
 import (
+	"github.com/nxtcoder17/fastlog/types"
 	"io"
 	"log/slog"
 	"os"
 	"time"
-	"github.com/nxtcoder17/fastlog/types"
 )
 
 var (
@@ -32,21 +32,21 @@ type Options struct {
 	WithCaller bool
 
 	WithTimestamp bool
-	WithColors  bool
+	WithColors    bool
 
 	SkipCallerFrames int
-	VerbosityLevel int
+	VerbosityLevel   int
 }
 
 func New() *loggerBuilder {
 	return &loggerBuilder{
 		options: &Options{
-			Writer: &syncWriter{writer: os.Stderr},
-			Format: types.LogFormatConsole,
-			LogLevel: slog.LevelInfo,
-			WithCaller: true,
-			WithTimestamp: true,
-			WithColors: true,
+			Writer:         &syncWriter{writer: os.Stderr},
+			Format:         types.LogFormatConsole,
+			LogLevel:       slog.LevelInfo,
+			WithCaller:     true,
+			WithTimestamp:  true,
+			WithColors:     true,
 			VerbosityLevel: 1,
 		},
 	}
@@ -54,40 +54,40 @@ func New() *loggerBuilder {
 
 func (l *loggerBuilder) JSON() Logger {
 	return &jsonLogger{
-		kv: nil, 
+		kv:     l.kv,
 		prefix: l.prefix,
-		opts: l.options,
+		opts:   l.options,
 		pool: newPool(&bufferPoolOptions{
 			WithTimestamp: l.options.WithTimestamp,
-			WithCaller: l.options.WithCaller,
-			WithColors: l.options.WithColors,
-			LogFormat: types.LogFormatJSON,
+			WithCaller:    l.options.WithCaller,
+			WithColors:    l.options.WithColors,
+			LogFormat:     types.LogFormatJSON,
 		}),
 	}
 }
 
 func (l *loggerBuilder) Logfmt() Logger {
 	return &logfmtLogger{
-		kv: nil,
+		kv:   l.kv,
 		opts: l.options,
 		pool: newPool(&bufferPoolOptions{
 			WithTimestamp: l.options.WithTimestamp,
-			WithCaller: l.options.WithCaller,
-			WithColors: l.options.WithColors,
-			LogFormat: types.LogFormatLogfmt,
+			WithCaller:    l.options.WithCaller,
+			WithColors:    l.options.WithColors,
+			LogFormat:     types.LogFormatLogfmt,
 		}),
 	}
 }
 
 func (l *loggerBuilder) Console() Logger {
 	return &consoleLogger{
-		kv: nil,
+		kv:   l.kv,
 		opts: l.options,
 		pool: newPool(&bufferPoolOptions{
 			WithTimestamp: l.options.WithTimestamp,
-			WithCaller: l.options.WithCaller,
-			WithColors: l.options.WithColors,
-			LogFormat: types.LogFormatConsole,
+			WithCaller:    l.options.WithCaller,
+			WithColors:    l.options.WithColors,
+			LogFormat:     types.LogFormatConsole,
 		}),
 	}
 }
@@ -122,7 +122,7 @@ func (l *loggerBuilder) LogLevel(level slog.Level) *loggerBuilder {
 	return l
 }
 
-// DebugMode is an alias to LogLevel(slog.LevelDebug) 
+// DebugMode is an alias to LogLevel(slog.LevelDebug)
 func (l *loggerBuilder) DebugMode(enable bool) *loggerBuilder {
 	l.options.LogLevel = slog.LevelDebug
 	return l
@@ -139,8 +139,9 @@ func (l *loggerBuilder) Verbosity(n int) *loggerBuilder {
 }
 
 type loggerBuilder struct {
-	prefix string
+	prefix  string
 	options *Options
+	kv      []any
 }
 
 type Logger interface {
@@ -169,4 +170,3 @@ func Logfmt() Logger {
 func Console() Logger {
 	return New().Console()
 }
-
