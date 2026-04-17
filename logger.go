@@ -176,7 +176,7 @@ func SetDefault(logger Logger) {
 	defaultLogger = logger
 }
 
-func GetDefault() Logger {
+func Default() Logger {
 	if defaultLogger != nil {
 		return defaultLogger
 	}
