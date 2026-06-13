@@ -1,3 +1,3 @@
 module github.com/nxtcoder17/fastlog
 
-go 1.20
+go 1.21

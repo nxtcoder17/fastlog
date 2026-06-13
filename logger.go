@@ -54,7 +54,7 @@ func New() *loggerBuilder {
 
 func (l *loggerBuilder) JSON() Logger {
 	return &jsonLogger{
-		kv:     nil,
+		kv:     l.kv,
 		prefix: l.prefix,
 		opts:   l.options,
 		pool: newPool(&bufferPoolOptions{
@@ -68,7 +68,7 @@ func (l *loggerBuilder) JSON() Logger {
 
 func (l *loggerBuilder) Logfmt() Logger {
 	return &logfmtLogger{
-		kv:   nil,
+		kv:   l.kv,
 		opts: l.options,
 		pool: newPool(&bufferPoolOptions{
 			WithTimestamp: l.options.WithTimestamp,
@@ -81,7 +81,7 @@ func (l *loggerBuilder) Logfmt() Logger {
 
 func (l *loggerBuilder) Console() Logger {
 	return &consoleLogger{
-		kv:   nil,
+		kv:   l.kv,
 		opts: l.options,
 		pool: newPool(&bufferPoolOptions{
 			WithTimestamp: l.options.WithTimestamp,
@@ -141,6 +141,7 @@ func (l *loggerBuilder) Verbosity(n int) *loggerBuilder {
 type loggerBuilder struct {
 	prefix  string
 	options *Options
+	kv      []any
 }
 
 type Logger interface {
@@ -169,7 +170,6 @@ func Logfmt() Logger {
 func Console() Logger {
 	return New().Console()
 }
-
 var defaultLogger Logger
 
 func SetDefault(logger Logger) {

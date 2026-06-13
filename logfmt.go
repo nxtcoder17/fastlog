@@ -5,10 +5,10 @@ import (
 )
 
 type logfmtLogger struct {
-	kv []any
+	kv     []any
 	prefix string
-	opts *Options
-	pool *Pool
+	opts   *Options
+	pool   *Pool
 }
 
 // Debug implements LoggerAPI.
@@ -33,35 +33,37 @@ func (l *logfmtLogger) Warn(msg string, kv ...any) {
 
 // With implements loggerAPI.
 func (l *logfmtLogger) With(kv ...any) Logger {
-	attrs := make([]any, 0, len(kv) + len(l.kv))
+	attrs := make([]any, 0, len(kv)+len(l.kv))
 	attrs = append(attrs, l.kv...)
 	attrs = append(attrs, kv...)
 
 	return &logfmtLogger{
-		kv: attrs,
-		pool:    l.pool,
+		kv:   attrs,
+		pool: l.pool,
 		opts: l.opts,
 	}
 }
 
 func (l *logfmtLogger) Slog() *slog.Logger {
 	kv := make([]slog.Attr, 0, len(l.kv))
-	for i := 1; i < len(l.kv); i+=2 {
+	for i := 1; i < len(l.kv); i += 2 {
 		kv = append(kv, slog.Any(l.kv[i-1].(string), l.kv[i]))
 	}
 
 	return slog.New(&logfmtSlog{
 		kv:   kv,
-		pool:  l.pool,
+		pool: l.pool,
 		opts: l.opts,
 	})
 }
 
 // Clone implements loggerAPI.
 func (l *logfmtLogger) Clone() *loggerBuilder {
+	optsCopy := *l.opts
 	return &loggerBuilder{
-		options: l.opts,
-		prefix: l.prefix,
+		options: &optsCopy,
+		prefix:  l.prefix,
+		kv:      l.kv,
 	}
 }
 
@@ -74,8 +76,16 @@ func (l *logfmtLogger) handleLog(level slog.Level, msg string, kv ...any) error 
 
 	buf := l.pool.Get()
 
-	buf.AppendCaller(2 + l.opts.SkipCallerFrames)
-	buf.AppendComponentSeparator()
+	needSep := false
+	if buf.AppendTimestamp() {
+		needSep = true
+	}
+	if buf.AppendCaller(2 + l.opts.SkipCallerFrames) {
+		needSep = true
+	}
+	if needSep {
+		buf.AppendComponentSeparator()
+	}
 
 	buf.AppendLogLevel(level)
 	buf.AppendComponentSeparator()
