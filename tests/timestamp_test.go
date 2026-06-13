@@ -10,24 +10,26 @@ import (
 
 func TestTimestamp_AllLoggers(t *testing.T) {
 	formats := []struct {
-		name   string
-		format string
+		name             string
+		format           string
+		timestampEnabled bool
 	}{
-		{"RFC3339", time.RFC3339},
-		{"RFC3339Nano", time.RFC3339Nano},
-		{"DateTime", time.DateTime},
-		{"DateOnly", time.DateOnly},
-		{"TimeOnly", time.TimeOnly},
-		{"RFC1123", time.RFC1123},
-		{"RFC1123Z", time.RFC1123Z},
-		{"RFC822", time.RFC822},
-		{"RFC822Z", time.RFC822Z},
-		{"Kitchen", time.Kitchen},
-		{"ANSIC", time.ANSIC},
-		{"Custom_SlashDate", "2006/01/02 15:04:05"},
-		{"Custom_DashDate", "02-01-2006 15:04:05"},
-		{"Custom_MonthName", "Jan 2, 2006 15:04:05"},
-		{"Custom_Millis", "2006-01-02T15:04:05.000Z"},
+		{"Timestamp Disabled", time.RFC3339, false},
+		{"RFC3339", time.RFC3339, true},
+		{"RFC3339Nano", time.RFC3339Nano, true},
+		{"DateTime", time.DateTime, true},
+		{"DateOnly", time.DateOnly, true},
+		{"TimeOnly", time.TimeOnly, true},
+		{"RFC1123", time.RFC1123, true},
+		{"RFC1123Z", time.RFC1123Z, true},
+		{"RFC822", time.RFC822, true},
+		{"RFC822Z", time.RFC822Z, true},
+		{"Kitchen", time.Kitchen, true},
+		{"ANSIC", time.ANSIC, true},
+		{"Custom_SlashDate", "2006/01/02 15:04:05", true},
+		{"Custom_DashDate", "02-01-2006 15:04:05", true},
+		{"Custom_MonthName", "Jan 2, 2006 15:04:05", true},
+		{"Custom_Millis", "2006-01-02T15:04:05.000Z", true},
 	}
 
 	originalFormat := fastlog.TimestampFormat
@@ -41,7 +43,7 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 				})
 
 				cw := newCapture()
-				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(true).Colors(false).JSON()
+				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(tf.timestampEnabled).Colors(false).JSON()
 
 				logger.Info("msg")
 
@@ -53,6 +55,14 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 				var m map[string]any
 				if err := json.Unmarshal([]byte(lines[0]), &m); err != nil {
 					t.Fatalf("invalid JSON: %v", err)
+				}
+
+				if !tf.timestampEnabled {
+					_, ok := m["timestamp"]
+					if ok {
+						t.Fatal("never expected timestamp field, when timestamp option is disabled")
+					}
+					return
 				}
 
 				ts, ok := m["timestamp"]
@@ -78,7 +88,7 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 				})
 
 				cw := newCapture()
-				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(true).Colors(false).Logfmt()
+				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(tf.timestampEnabled).Colors(false).Logfmt()
 
 				logger.Info("msg")
 
@@ -88,6 +98,14 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 				}
 
 				tsStr := extractLogfmtTimestamp(lines[0])
+
+				if !tf.timestampEnabled {
+					if tsStr != "" {
+						t.Fatal("never expected non-empty timestamp, when timestamp option is disabled")
+					}
+					return
+				}
+
 				if tsStr == "" {
 					t.Fatal("expected non-empty timestamp")
 				}
@@ -98,30 +116,15 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 	})
 
 	t.Run("Console", func(t *testing.T) {
-		skipFormats := map[string]bool{
-			"DateTime":         true,
-			"RFC1123":          true,
-			"RFC1123Z":         true,
-			"RFC822":           true,
-			"RFC822Z":          true,
-			"ANSIC":            true,
-			"Custom_SlashDate": true,
-			"Custom_DashDate":  true,
-			"Custom_MonthName": true,
-		}
-
 		for _, tf := range formats {
 			t.Run(tf.name, func(t *testing.T) {
-				if skipFormats[tf.name] {
-					t.Skip("console output is space-delimited, can't extract timestamps containing spaces")
-				}
 				fastlog.TimestampFormat = tf.format
 				t.Cleanup(func() {
 					fastlog.TimestampFormat = originalFormat
 				})
 
 				cw := newCapture()
-				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(true).Colors(false).Console()
+				logger := fastlog.New().Writer(cw).Caller(false).Timestamp(tf.timestampEnabled).Colors(false).Console()
 
 				logger.Info("msg")
 
@@ -130,12 +133,19 @@ func TestTimestamp_AllLoggers(t *testing.T) {
 					t.Fatalf("expected 1 line, got %d", len(lines))
 				}
 
-				parts := strings.SplitN(lines[0], " ", 2)
-				if len(parts) < 1 {
-					t.Fatal("empty console output")
+				parts := strings.Split(lines[0], " | ")
+				if len(parts) < 2 {
+					t.Fatalf("unexpected console output format: %q", lines[0])
 				}
-				tsStr := parts[0]
 
+				if !tf.timestampEnabled {
+					if parts[0] != "INFO" {
+						t.Fatalf("never expected timestamp when timestamp option is disabled, but got: %q", parts[0])
+					}
+					return
+				}
+
+				tsStr := parts[0]
 				assertValidTimestamp(t, tsStr, tf.format)
 			})
 		}
