@@ -170,16 +170,4 @@ func Logfmt() Logger {
 func Console() Logger {
 	return New().Console()
 }
-var defaultLogger Logger
 
-func SetDefault(logger Logger) {
-	defaultLogger = logger
-}
-
-func Default() Logger {
-	if defaultLogger != nil {
-		return defaultLogger
-	}
-
-	return Console()
-}
