@@ -124,7 +124,9 @@ func (l *loggerBuilder) LogLevel(level slog.Level) *loggerBuilder {
 
 // DebugMode is an alias to LogLevel(slog.LevelDebug)
 func (l *loggerBuilder) DebugMode(enable bool) *loggerBuilder {
-	l.options.LogLevel = slog.LevelDebug
+	if enable {
+		l.options.LogLevel = slog.LevelDebug
+	}
 	return l
 }
 
@@ -170,4 +172,3 @@ func Logfmt() Logger {
 func Console() Logger {
 	return New().Console()
 }
-
